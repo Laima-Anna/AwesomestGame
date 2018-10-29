@@ -1,4 +1,6 @@
 import pygame
+from random import randrange
+from random import randint
 
 pygame.init()
 
@@ -18,6 +20,9 @@ clock = pygame.time.Clock()
 #update all display at once
 #pygame.display.flip()
 
+
+   
+
 def message(msg,color):
     font= pygame.font.SysFont(None, 25)
     screen_text = font.render(msg, True, color)
@@ -33,6 +38,11 @@ def gameLoop():
     lead_y_change = 0
     size=20
     
+    #block = randint(10,100)
+    block=30
+    #x=randrange(0,display_width-block)
+    x=100
+    y=0
     
     while not gameExit:
         while gameOver:
@@ -68,9 +78,12 @@ def gameLoop():
             lead_x_change=0
             
         
+      
         
         gameDisplay.fill(white)
         pygame.draw.rect(gameDisplay, black, [lead_x,lead_y,size,size])
+        pygame.draw.rect(gameDisplay, red, [x,y,block,block])
+        y+=10
         pygame.display.update()
             
         clock.tick(15)
