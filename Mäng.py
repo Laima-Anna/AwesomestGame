@@ -37,12 +37,11 @@ def gameLoop():
     lead_x_change = 0
     lead_y_change = 0
     size=20
-    
-    #block = randint(10,100)
-    block=30
-    #x=randrange(0,display_width-block)
-    x=100
-    y=0
+
+    block_y=0
+    block = randint(10,100)
+    block_x=randrange(0,display_width-block)
+    i=0
     
     while not gameExit:
         while gameOver:
@@ -77,14 +76,26 @@ def gameLoop():
         if lead_x >= display_width-size or lead_x < 0+size:
             lead_x_change=0
             
-        
-      
-        
+            
+        if block_y<display_height:
+            block_y+=10
+        else:
+            block_y=0-block
+            block = randint(10,100)
+            block_x=randrange(0,display_width-block)
+            
         gameDisplay.fill(white)
         pygame.draw.rect(gameDisplay, black, [lead_x,lead_y,size,size])
-        pygame.draw.rect(gameDisplay, red, [x,y,block,block])
-        y+=10
+        pygame.draw.rect(gameDisplay, red, [block_x,block_y,block,block])
+        
         pygame.display.update()
+        
+        if lead_x>block_x and lead_x<block_x+block or lead_x+size>block_x and lead_x+size<block_x+block:
+            if lead_y>block_y and lead_y<block_y+block or lead_y+size>block_y and lead_y+size<block_y+block:
+                print(i)
+                i+=1
+                #gameOver=True
+                
             
         clock.tick(15)
             

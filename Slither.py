@@ -20,8 +20,8 @@ pygame.display.set_caption('Slither')
 #update all display at once
 #pygame.display.flip()
 
-block_size = 10
-FPS = 30
+block_size = 20
+FPS = 20
 
 clock = pygame.time.Clock()
 
@@ -46,8 +46,8 @@ def gameLoop():
     snakelist = []
     snakeLenght = 1
     
-    randAppleX = round(random.randrange(0,display_width-block_size)/10.0)*10.0
-    randAppleY = round(random.randrange(0,display_height-block_size)/10.0)*10.0
+    randAppleX = round(random.randrange(0,display_width-block_size))#/10.0)*10.0
+    randAppleY = round(random.randrange(0,display_height-block_size))#/10.0)*10.0
     
     while not gameExit:
         while gameOver:
@@ -90,7 +90,9 @@ def gameLoop():
         lead_y += lead_y_change
         
         gameDisplay.fill(white)
-        pygame.draw.rect(gameDisplay, red, [randAppleX,randAppleY,block_size,block_size])
+        
+        appleThick=30
+        pygame.draw.rect(gameDisplay, red, [randAppleX,randAppleY,appleThick,appleThick])
         
         
         snakeHead = []
@@ -108,12 +110,20 @@ def gameLoop():
         snake(block_size,snakelist)
         pygame.display.update()
         
-        if lead_x == randAppleX and lead_y ==randAppleY:
-            randAppleX = round(random.randrange(0,display_width-block_size)/10.0)*10.0
-            randAppleY = round(random.randrange(0,display_height-block_size)/10.0)*10.0
-            snakeLenght +=1
-            
         
+##        if lead_x>=randAppleX and lead_x<=randAppleX + appleThick:  
+##            if lead_y>=randAppleY and lead_y<=randAppleY + appleThick:
+##                randAppleX = round(random.randrange(0,display_width-block_size))#/10.0)*10.0
+##                randAppleY = round(random.randrange(0,display_height-block_size))#/10.0)*10.0
+##                snakeLenght +=1
+        
+        if lead_x>randAppleX and lead_x<randAppleX+appleThick or lead_x+block_size>randAppleX and lead_x+block_size<randAppleX+appleThick:
+            if lead_y>randAppleY and lead_y<randAppleY+appleThick or lead_y+block_size>randAppleY and lead_y+block_size<randAppleY+appleThick:
+                randAppleX = round(random.randrange(0,display_width-block_size))#/10.0)*10.0
+                randAppleY = round(random.randrange(0,display_height-block_size))#/10.0)*10.0
+                snakeLenght +=1
+                
+                
         clock.tick(FPS)
 
 
