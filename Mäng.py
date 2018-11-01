@@ -32,8 +32,8 @@ def gameLoop():
     gameExit = False
     gameOver = False
 
-    lead_x = 300
-    lead_y = 300
+    lead_x = display_width/2
+    lead_y = display_height-50
     lead_x_change = 0
     lead_y_change = 0
     size=20
@@ -71,10 +71,15 @@ def gameLoop():
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT :
                     lead_x_change = 0
+            
+            #Add player movement with mouse/touchpad
+            if event.type == pygame.MOUSEMOTION:
+                lead_x = event.pos[0]
 
         lead_x += lead_x_change
-        if lead_x >= display_width-size or lead_x < 0+size:
-            lead_x_change=0
+ 
+        #if lead_x >= display_width-size or lead_x < 0+size:
+        #    lead_x_change=0
             
             
         if block_y<display_height:
@@ -83,6 +88,16 @@ def gameLoop():
             block_y=0-block
             block = randint(10,100)
             block_x=randrange(0,display_width-block)
+
+        
+        #Make sure that player cannot move outside the edge of the screen
+        if lead_x >= display_width-size:
+            lead_x = display_width - size
+            lead_x_change=0   
+        if lead_x < 0+size:
+            lead_x = 0
+            lead_x_change = 0
+
             
         gameDisplay.fill(white)
         pygame.draw.rect(gameDisplay, black, [lead_x,lead_y,size,size])
