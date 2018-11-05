@@ -42,14 +42,11 @@ def gameLoop():
     lead_x_change = 0
     lead_y_change = 0
     size=20
-
-    block_y=0
-    block = randint(10,100)
-    block_x=randrange(0,display_width-block)
-    i=0
-    start_time=time.time()
     
+    start_time=time.time()
+    numb=0
     blocks=[]
+    
     
     while not gameExit:
         while gameOver:
@@ -86,15 +83,25 @@ def gameLoop():
 
         lead_x += lead_x_change
  
+        #moment after 5 sec
+        if time.time() -start_time > 2:
+            start_time=time.time()
+            
+            s = randint(10,100)
+            x=randrange(0,display_width-s)
+            speed=randint(5,20)
+            y=0-s
+            blocks+=[[x,y,s,speed]]
+            
             
         #random falling   
-        if block_y<display_height:
-            #block speed
-            block_y+=10
-        else:
-            block_y=0-block
-            block = randint(10,100)
-            block_x=randrange(0,display_width-block)
+##        if block_y<display_height:
+##            #block speed
+##            block_y+=10
+##        else:
+##            block_y=0-block
+##            block = randint(10,100)
+##            block_x=randrange(0,display_width-block)
 
         
         #Make sure that player cannot move outside the edge of the screen
@@ -108,25 +115,35 @@ def gameLoop():
             
         gameDisplay.fill(white)
         pygame.draw.rect(gameDisplay, black, [lead_x,lead_y,size,size])
-        pygame.draw.rect(gameDisplay, red, [block_x,block_y,block,block])
+        #pygame.draw.rect(gameDisplay, red, [block_x,block_y,block,block])
+        for i in blocks:
+            i[1]+=i[3]
+            pygame.draw.rect(gameDisplay, red, [i[0],i[1],i[2],i[2]])
+            if i[1]>display_height:
+                blocks.remove(i)
+            print(blocks)
         
+            if lead_x>i[0] and lead_x<i[0]+i[2] or lead_x+size>i[0] and lead_x+size<i[0]+i[2]:
+                if lead_y>i[1] and lead_y<i[1]+i[2] or lead_y+size>i[1] and lead_y+size<i[1]+i[2]:
+                    print(numb)
+                    numb+=1
+                    #gameOver=True
+                
+                
         pygame.display.update()
         
         #collision
-        if lead_x>block_x and lead_x<block_x+block or lead_x+size>block_x and lead_x+size<block_x+block:
-            if lead_y>block_y and lead_y<block_y+block or lead_y+size>block_y and lead_y+size<block_y+block:
-                print(i)
-                i+=1
-                #gameOver=True
+##        if lead_x>block_x and lead_x<block_x+block or lead_x+size>block_x and lead_x+size<block_x+block:
+##            if lead_y>block_y and lead_y<block_y+block or lead_y+size>block_y and lead_y+size<block_y+block:
+##                print(i)
+##                i+=1
+##                #gameOver=True
+        
         
 
-        #moment after 5 sec
-        if time.time() -start_time > 2:
-            print('aaa')
-            start_time=time.time()
-            #blocks.append()
+        
             
-            
+        
         clock.tick(30)
             
     pygame.quit()
