@@ -103,9 +103,7 @@ def gameLoop():
         
         #drawing every figure in blocks list
         for i in blocks:
-            #x + speed
-            i[1]+=i[3]
-            #pygame.draw.rect(gameDisplay, red, [i[0],i[1],i[2],i[2]])
+            i[1]+=i[3]  #x + speed
             fireball_icon = pygame.transform.scale(fireball, (i[2], i[2]+20))
             gameDisplay.blit(fireball_icon, [i[0], i[1]])
             
@@ -114,10 +112,10 @@ def gameLoop():
             print(blocks)
             
             #collision
-            if lead_x>i[0] and lead_x<i[0]+i[2] or lead_x+size_x>i[0] and lead_x+size_x<i[0]+i[2]:
+            if lead_x>i[0] and lead_x<i[0]+i[2] or lead_x+size_x>i[0] and lead_x+size_x<i[0]+i[2] or lead_x<i[0] and lead_x+size_x>i[0]+i[2]:
                 if lead_y>i[1] and lead_y<i[1]+i[2] or lead_y+size_y>i[1] and lead_y+size_y<i[1]+i[2]:
-                    print(numb)
-                    numb+=1
+                    #print(numb)
+                    #numb+=1
                     gameOver=True
                 
                 
