@@ -4,12 +4,14 @@ import time
 from random import randrange
 from random import randint
 
+#Always displays game screen in the middle of the computer screen
 os.environ['SDL_VIDEO_CENTERED']='1'
 pygame.init()
 
 white = (255,255,255)
 black = (0,0,0)
 red = (255,0,0)
+grey = (220,220,220)
 
 FPS = 30
 
@@ -20,6 +22,7 @@ bg = pygame.image.load("space.jpg")
 gameDisplay = pygame.display.set_mode((display_width,display_height))
 player = pygame.image.load("spaceship.png").convert_alpha()
 
+#Our player width and height
 size_x = int(player.get_size()[0]/10)
 size_y = int(player.get_size()[1]/10)
 player = pygame.transform.scale(player, (size_x, size_y))
@@ -28,17 +31,34 @@ pygame.display.set_caption('Mäng')
 
 clock = pygame.time.Clock()
 
-def message(msg,color, y_displace=0):
-    font = pygame.font.SysFont(None, 25)
-    textSurf = font.render(msg, True, color)
-    textRect = textSurf.get_rect()
-    textRect.center = (display_width/2), (display_height/2)+y_displace
+font = pygame.font.SysFont(None, 25)
+
+#Variables for displaying text in center of screen
+center_x = display_width/2
+center_y = display_height/2
+
+#Two functions for displaying text on screen
+def textObjects(text, color):
+    textSurface = font.render(text, True, color)
+    return textSurface, textSurface.get_rect()
+
+def message(msg, color, y_displace=0, center_x=center_x, center_y=center_y):
+    textSurf, textRect = textObjects(msg, color)
+    textRect.center = (center_x), (center_y)+y_displace
     gameDisplay.blit(textSurf, textRect)
-    pygame.display.update()
-    
+
+#Start screen
 def gameIntro():
     intro = True
-
+    
+    #Button dimensions
+    button_x = 100
+    button_y = 50
+    button_loc_y = display_height/2+100
+    mediumButton_x = display_width/2-button_x/2
+    easyButton_x = mediumButton_x-200
+    hardButton_x = mediumButton_x+200
+    
     while intro:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -48,11 +68,31 @@ def gameIntro():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_e:
                     intro = False
+                    
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_x = pygame.mouse.get_pos()[0]
+                mouse_y = pygame.mouse.get_pos()[1]
+                if (easyButton_x < mouse_x < easyButton_x + button_x) and (button_loc_y < mouse_y < button_loc_y + button_y):
+                    intro = False
         
         gameDisplay.fill(white)
+
         message("Mängu eesmärgiks on hoida oma kosmoselaev tervena.", red, -100)
-        message("""Palun vajuta klahvi "e", et mängu alustada.""", black)
-        clock.tick(15)
+        message("""Palun vajuta klahvi "e", et mängu alustada või vali tase.""", black)
+        
+        easyButton = pygame.draw.rect(gameDisplay, grey,
+                                      (easyButton_x,button_loc_y, button_x, button_y))
+        mediumButton = pygame.draw.rect(gameDisplay, grey,
+                                        (mediumButton_x,button_loc_y, button_x, button_y))
+        hardButton = pygame.draw.rect(gameDisplay, grey,
+                                      (hardButton_x,button_loc_y, button_x, button_y))
+        
+        message("Lihtne", black, 0, easyButton_x+button_x/2, button_loc_y+button_y/2)
+        message("Keskmine", black, 0, mediumButton_x+button_x/2, button_loc_y+button_y/2)
+        message("Raske", black, 0, hardButton_x+button_x/2, button_loc_y+button_y/2)
+        
+        pygame.display.update()
+        clock.tick(FPS)
     
 def gameLoop():
     gameExit = False
@@ -75,6 +115,7 @@ def gameLoop():
         while gameOver:
             gameDisplay.fill(white)
             message('Game over, press C to play again or Q to quit', red)
+            pygame.display.update()
             
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -105,7 +146,7 @@ def gameLoop():
 
         lead_x += lead_x_change
  
-        #moment after 5 sec
+        #A new fireball appears after every two seconds
         if time.time() -start_time > 2:
             start_time=time.time()
             #make fireball dimensions correct
@@ -128,7 +169,7 @@ def gameLoop():
         gameDisplay.blit(bg, (0,0))
         gameDisplay.blit(player, [lead_x,lead_y])
         
-        #drawing every figure in blocks list
+        #drawing every figure in blocks list (fireball info)
         for i in blocks:
             i[1]+=i[4]  #x + speed
             fireball_icon = pygame.transform.scale(fireball, (i[2], i[3]))
@@ -146,11 +187,9 @@ def gameLoop():
                     gameOver=True
                 
         pygame.display.update()
-        
         clock.tick(FPS)
             
     pygame.quit()
     
-
 gameIntro()
 gameLoop()
