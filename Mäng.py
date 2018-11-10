@@ -11,6 +11,8 @@ white = (255,255,255)
 black = (0,0,0)
 red = (255,0,0)
 
+FPS = 30
+
 display_width = 800
 display_height = 600
 
@@ -24,12 +26,33 @@ player = pygame.transform.scale(player, (size_x, size_y))
 
 pygame.display.set_caption('Mäng')
 
-clock = pygame.time.Clock()   
+clock = pygame.time.Clock()
 
-def message(msg,color):
-    font= pygame.font.SysFont(None, 25)
-    screen_text = font.render(msg, True, color)
-    gameDisplay.blit(screen_text, [display_width/2,display_height/2])
+def message(msg,color, y_displace=0):
+    font = pygame.font.SysFont(None, 25)
+    textSurf = font.render(msg, True, color)
+    textRect = textSurf.get_rect()
+    textRect.center = (display_width/2), (display_height/2)+y_displace
+    gameDisplay.blit(textSurf, textRect)
+    pygame.display.update()
+    
+def gameIntro():
+    intro = True
+
+    while intro:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_e:
+                    intro = False
+        
+        gameDisplay.fill(white)
+        message("Mängu eesmärgiks on hoida oma kosmoselaev tervena.", red, -100)
+        message("""Palun vajuta klahvi "e", et mängu alustada.""", black)
+        clock.tick(15)
     
 def gameLoop():
     gameExit = False
@@ -52,7 +75,6 @@ def gameLoop():
         while gameOver:
             gameDisplay.fill(white)
             message('Game over, press C to play again or Q to quit', red)
-            pygame.display.update()
             
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -125,8 +147,10 @@ def gameLoop():
                 
         pygame.display.update()
         
-        clock.tick(30)
+        clock.tick(FPS)
             
     pygame.quit()
+    
 
+gameIntro()
 gameLoop()
