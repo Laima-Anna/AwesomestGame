@@ -13,12 +13,13 @@ red = (255,0,0)
 
 display_width = 800
 display_height = 600
-size_x = 90
-size_y = 50
 
 bg = pygame.image.load("space.jpg")
 gameDisplay = pygame.display.set_mode((display_width,display_height))
 player = pygame.image.load("spaceship.png").convert_alpha()
+
+size_x = int(player.get_size()[0]/10)
+size_y = int(player.get_size()[1]/10)
 player = pygame.transform.scale(player, (size_x, size_y))
 
 pygame.display.set_caption('Mäng')
@@ -44,6 +45,8 @@ def gameLoop():
     blocks=[]
     
     fireball = pygame.image.load("fireball.png").convert_alpha()
+    fireball_width = fireball.get_size()[0]
+    fireball_height = fireball.get_size()[1]
     
     while not gameExit:
         while gameOver:
@@ -67,34 +70,36 @@ def gameLoop():
                 gameExit = True
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
-                    lead_x_change = -size_x
+                    lead_x_change = -size_x/2
                 if event.key == pygame.K_RIGHT:
-                    lead_x_change = size_x
+                    lead_x_change = size_x/2
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT :
                     lead_x_change = 0
             
             #Add player movement with mouse/touchpad
             if event.type == pygame.MOUSEMOTION:
-                lead_x = event.pos[0]
+                lead_x = event.pos[0]-(size_x/2) #cursor in the middle of spaceship
 
         lead_x += lead_x_change
  
         #moment after 5 sec
         if time.time() -start_time > 2:
             start_time=time.time()
-            
-            s = randint(10,100)
-            x=randrange(0,display_width-s)
+            #make fireball dimensions correct
+            s = randint(5, 25)
+            fireball_x = int(fireball_width/s)
+            fireball_y = int(fireball_height/s)
+            x=randrange(0,display_width - fireball_x)
             speed=randint(5,20)
-            y=0-s
-            blocks+=[[x,y,s,speed]]
+            y=0-fireball_y
+            blocks+=[[x,y, fireball_x, fireball_y,speed]]
              
         #Make sure that player cannot move outside the edge of the screen
-        if lead_x >= display_width-size_x:
+        if lead_x >= display_width - size_x:
             lead_x = display_width - size_x
             lead_x_change=0   
-        if lead_x < 0+size_x:
+        if lead_x < 0:
             lead_x = 0
             lead_x_change = 0
 
@@ -103,8 +108,8 @@ def gameLoop():
         
         #drawing every figure in blocks list
         for i in blocks:
-            i[1]+=i[3]  #x + speed
-            fireball_icon = pygame.transform.scale(fireball, (i[2], i[2]+20))
+            i[1]+=i[4]  #x + speed
+            fireball_icon = pygame.transform.scale(fireball, (i[2], i[3]))
             gameDisplay.blit(fireball_icon, [i[0], i[1]])
             
             if i[1]>display_height:
@@ -117,7 +122,6 @@ def gameLoop():
                     #print(numb)
                     #numb+=1
                     gameOver=True
-                
                 
         pygame.display.update()
         
