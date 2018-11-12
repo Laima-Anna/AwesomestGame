@@ -37,6 +37,8 @@ font = pygame.font.SysFont(None, 25)
 center_x = display_width/2
 center_y = display_height/2
 
+
+
 #Two functions for displaying text on screen
 def textObjects(text, color):
     textSurface = font.render(text, True, color)
@@ -50,7 +52,7 @@ def message(msg, color, y_displace=0, center_x=center_x, center_y=center_y):
 #Start screen
 def gameIntro():
     intro = True
-    
+    level=''
     #Button dimensions
     button_x = 100
     button_y = 50
@@ -64,21 +66,23 @@ def gameIntro():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-            
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_e:
-                    intro = False
                     
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x = pygame.mouse.get_pos()[0]
                 mouse_y = pygame.mouse.get_pos()[1]
                 if (easyButton_x < mouse_x < easyButton_x + button_x) and (button_loc_y < mouse_y < button_loc_y + button_y):
+                    level = 'easy'
+                    intro = False
+                if (mediumButton_x < mouse_x < mediumButton_x + button_x) and (button_loc_y < mouse_y < button_loc_y + button_y):
+                    level = 'medium'
+                    intro = False
+                if (hardButton_x < mouse_x < hardButton_x + button_x) and (button_loc_y < mouse_y < button_loc_y + button_y):
+                    level = 'hard'
                     intro = False
         
         gameDisplay.fill(white)
 
-        message("Mängu eesmärgiks on hoida oma kosmoselaev tervena.", red, -100)
-        message("""Palun vajuta klahvi "e", et mängu alustada või vali tase.""", black)
+        message("Mängu eesmärgiks on hoida oma kosmoselaev tervena.", black, -100)
         
         easyButton = pygame.draw.rect(gameDisplay, grey,
                                       (easyButton_x,button_loc_y, button_x, button_y))
@@ -93,8 +97,9 @@ def gameIntro():
         
         pygame.display.update()
         clock.tick(FPS)
+    return level
     
-def gameLoop():
+def gameLoop(level):
     gameExit = False
     gameOver = False
 
@@ -113,7 +118,7 @@ def gameLoop():
     
     while not gameExit:
         while gameOver:
-            gameDisplay.fill(white)
+            #gameDisplay.fill(white)
             message('Game over, press C to play again or Q to quit', red)
             pygame.display.update()
             
@@ -145,18 +150,44 @@ def gameLoop():
                 lead_x = event.pos[0]-(size_x/2) #cursor in the middle of spaceship
 
         lead_x += lead_x_change
- 
-        #A new fireball appears after every two seconds
-        if time.time() -start_time > 2:
-            start_time=time.time()
-            #make fireball dimensions correct
-            s = randint(5, 25)
-            fireball_x = int(fireball_width/s)
-            fireball_y = int(fireball_height/s)
-            x=randrange(0,display_width - fireball_x)
-            speed=randint(5,20)
-            y=0-fireball_y
-            blocks+=[[x,y, fireball_x, fireball_y,speed]]
+         
+        if level=='easy':
+            #A new fireball appears after every two seconds
+            if time.time() -start_time > 2:
+                start_time=time.time()
+                #make fireball dimensions correct
+                s = randint(5, 25)
+                fireball_x = int(fireball_width/s)
+                fireball_y = int(fireball_height/s)
+                x=randrange(0,display_width - fireball_x)
+                speed=randint(5,20)
+                y=0-fireball_y
+                blocks+=[[x,y, fireball_x, fireball_y,speed]]
+        
+        elif level=='medium':
+            #A new fireball appears after every 1 second
+            if time.time() -start_time > 1:
+                start_time=time.time()
+                #make fireball dimensions correct
+                s = randint(5, 25)
+                fireball_x = int(fireball_width/s)
+                fireball_y = int(fireball_height/s)
+                x=randrange(0,display_width - fireball_x)
+                speed=randint(10,30)
+                y=0-fireball_y
+                blocks+=[[x,y, fireball_x, fireball_y,speed]]
+        elif level=='hard':
+            #A new fireball appears after every two seconds
+            if time.time() -start_time > 0.5:
+                start_time=time.time()
+                #make fireball dimensions correct
+                s = randint(5, 25)
+                fireball_x = int(fireball_width/s)
+                fireball_y = int(fireball_height/s)
+                x=randrange(0,display_width - fireball_x)
+                speed=randint(15,40)
+                y=0-fireball_y
+                blocks+=[[x,y, fireball_x, fireball_y,speed]]
              
         #Make sure that player cannot move outside the edge of the screen
         if lead_x >= display_width - size_x:
@@ -190,6 +221,7 @@ def gameLoop():
         clock.tick(FPS)
             
     pygame.quit()
-    
-gameIntro()
-gameLoop()
+
+
+level=gameIntro()
+gameLoop(level)
