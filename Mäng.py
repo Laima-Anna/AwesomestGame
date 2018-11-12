@@ -31,13 +31,18 @@ pygame.display.set_caption('Mäng')
 
 clock = pygame.time.Clock()
 
-font = pygame.font.SysFont(None, 25)
+font = pygame.font.SysFont(None, 40)
 
 #Variables for displaying text in center of screen
 center_x = display_width/2
 center_y = display_height/2
 
 
+
+def show_score(start):
+    new_time=time.time()-start
+    message(str(round(new_time)), white, -display_height/2+40,display_width-len(str(round(new_time)))*10-10)
+    return new_time
 
 #Two functions for displaying text on screen
 def textObjects(text, color):
@@ -116,10 +121,13 @@ def gameLoop(level):
     fireball_width = fireball.get_size()[0]
     fireball_height = fireball.get_size()[1]
     
+    state='Game Over'
+    start=time.time()
+    
     while not gameExit:
         while gameOver:
             #gameDisplay.fill(white)
-            message('Game over, press C to play again or Q to quit', red)
+            message(state+', press C to play again or Q to quit', red)
             pygame.display.update()
             
             for event in pygame.event.get():
@@ -131,7 +139,11 @@ def gameLoop(level):
                         gameExit = True
                         gameOver = False
                     if event.key == pygame.K_c:
-                        gameLoop()
+                        start=time.time()
+                        gameLoop(level)
+                        
+                        
+
             
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -148,7 +160,9 @@ def gameLoop(level):
             #Add player movement with mouse/touchpad
             if event.type == pygame.MOUSEMOTION:
                 lead_x = event.pos[0]-(size_x/2) #cursor in the middle of spaceship
-
+        
+        
+        
         lead_x += lead_x_change
          
         if level=='easy':
@@ -216,12 +230,15 @@ def gameLoop(level):
                     #print(numb)
                     #numb+=1
                     gameOver=True
-                
+        score=show_score(start)
+        if score>20:
+            state='You won'
+            gameOver=True
+ 
         pygame.display.update()
         clock.tick(FPS)
             
     pygame.quit()
-
 
 level=gameIntro()
 gameLoop(level)
