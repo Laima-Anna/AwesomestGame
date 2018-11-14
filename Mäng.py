@@ -5,13 +5,13 @@ from random import randrange
 from random import randint
 
 #Always displays game screen in the middle of the computer screen
-os.environ['SDL_VIDEO_CENTERED']='1'
+os.environ['SDL_VIDEO_CENTERED'] = '1'
 pygame.init()
 
-white = (255,255,255)
-black = (0,0,0)
-red = (255,0,0)
-grey = (220,220,220)
+white = (255, 255, 255)
+black = (0, 0, 0)
+red = (255, 0, 0)
+grey = (220, 220, 220)
 
 FPS = 30
 
@@ -45,7 +45,7 @@ def show_score(start):
     return new_time
 
 #Two functions for displaying text on screen
-def textObjects(text, color):
+def textObjects (text, color):
     textSurface = font.render(text, True, color)
     return textSurface, textSurface.get_rect()
 
