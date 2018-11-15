@@ -39,10 +39,17 @@ center_y = display_height/2
 
 
 
-def show_score(start):
+def show_time(start):
     new_time=time.time()-start
     message(str(round(new_time)), white, -display_height/2+40,display_width-len(str(round(new_time)))*10-10)
+    #here as well bonuses
+    #score showing in one function?
     return new_time
+
+def show_score(count):
+    message(str(count), white, -display_height/2+40,display_width-len(str(count))*10-10)
+    #here should be score addition when there are bonuses
+    return count
 
 #Two functions for displaying text on screen
 def textObjects (text, color):
@@ -59,7 +66,7 @@ def gameIntro():
     intro = True
     level=''
     #Button dimensions
-    button_x = 100
+    button_x = 140
     button_y = 50
     button_loc_y = display_height/2+100
     mediumButton_x = display_width/2-button_x/2
@@ -85,9 +92,9 @@ def gameIntro():
                     level = 'hard'
                     intro = False
         
-        gameDisplay.fill(white)
+        gameDisplay.blit(bg, (0,0))
 
-        message("Mängu eesmärgiks on hoida oma kosmoselaev tervena.", black, -100)
+        message("Mängu eesmärgiks on hoida oma kosmoselaev tervena.", white, -100)
         
         easyButton = pygame.draw.rect(gameDisplay, grey,
                                       (easyButton_x,button_loc_y, button_x, button_y))
@@ -116,6 +123,7 @@ def gameLoop(level):
     start_time=time.time()
     numb=0
     blocks=[]
+    block_count = 0
     
     fireball = pygame.image.load("fireball.png").convert_alpha()
     fireball_width = fireball.get_size()[0]
@@ -126,8 +134,7 @@ def gameLoop(level):
     
     while not gameExit:
         while gameOver:
-            #gameDisplay.fill(white)
-            message(state+', press C to play again or Q to quit', red)
+            message(state+', press C to play again or Q to quit', white)
             pygame.display.update()
             
             for event in pygame.event.get():
@@ -142,8 +149,6 @@ def gameLoop(level):
                         start=time.time()
                         gameLoop(level)
                         
-                        
-
             
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -164,7 +169,9 @@ def gameLoop(level):
         
         
         lead_x += lead_x_change
-         
+        
+        ## make as a function variables in if statements???
+        
         if level=='easy':
             #A new fireball appears after every two seconds
             if time.time() -start_time > 2:
@@ -222,6 +229,7 @@ def gameLoop(level):
             
             if i[1]>display_height:
                 blocks.remove(i)
+                block_count+=1
             print(blocks)
             
             #collision
@@ -230,10 +238,21 @@ def gameLoop(level):
                     #print(numb)
                     #numb+=1
                     gameOver=True
-        score=show_score(start)
-        if score>20:
-            state='You won'
-            gameOver=True
+                 
+            #other mode
+##            if mode=='other?':
+            score=show_score(block_count)
+            state='Your score: '+str(score)
+            
+            #how to manage code (score) if we have those bonuses??
+            #write instructions about modes, what each one does etc
+                
+            #time mode
+##            if mode=='time':
+##                score=show_time(start)
+##                if score>20:
+##                    state='You won'
+##                    gameOver=True
  
         pygame.display.update()
         clock.tick(FPS)
