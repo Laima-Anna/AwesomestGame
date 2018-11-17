@@ -67,7 +67,8 @@ def button(text, color, x, y, width, height):
 #Start screen
 def gameIntro():
     intro = True
-    level=''
+    level = ''
+    mode = ''
     #Button dimensions
     button_x = 140
     button_y = 50
@@ -82,6 +83,9 @@ def gameIntro():
     
     scorecolor = grey
     timecolor = grey
+    
+    warningMessage = message("Please choose mode first!", red, +100)
+                    
     
     while intro:
         for event in pygame.event.get():
@@ -104,6 +108,7 @@ def gameIntro():
                     mode = 'score'
                     
                 #Choose which level you want to play
+                    
                 if (easyButton_x < mouse_x < easyButton_x + button_x) and (button_loc_y < mouse_y < button_loc_y + button_y):
                     level = 'easy'
                     intro = False
@@ -121,6 +126,9 @@ def gameIntro():
 
         button("Time", timecolor, timeMode_x, modeButton_y, button_x, button_y)
         button("Score", scorecolor, scoreMode_x, modeButton_y, button_x, button_y)
+        
+        if mode == '':
+            message("Please choose mode first!", red, +100)
         
         message("Choose your level", white, +150)
         
