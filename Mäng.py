@@ -82,10 +82,7 @@ def gameIntro():
     modeButton_y = display_height/2
     
     scorecolor = grey
-    timecolor = grey
-    
-    warningMessage = message("Please choose mode first!", red, +100)
-                    
+    timecolor = grey                    
     
     while intro:
         for event in pygame.event.get():
