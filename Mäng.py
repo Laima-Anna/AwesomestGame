@@ -254,26 +254,28 @@ def gameLoop(level, mode):
                 blocks.remove(i)
                 block_count+=1
             print(blocks)
-            
+               
             #collision
             if lead_x>i[0] and lead_x<i[0]+i[2] or lead_x+size_x>i[0] and lead_x+size_x<i[0]+i[2] or lead_x<i[0] and lead_x+size_x>i[0]+i[2]:
                 if lead_y>i[1] and lead_y<i[1]+i[3] or lead_y+size_y>i[1] and lead_y+size_y<i[1]+i[3]:
                     #print(numb)
                     #numb+=1
                     gameOver=True
+          
+          
+        #Show score according to chosen mode
+        if mode == 'score':
+            score=show_score(block_count)
+            state='Your score: '+str(score)
+        elif mode == 'time':
+            score=show_time(start)
+            if score>20:
+                state='You won'
+                gameOver=True
             
-            #Show score according to chosen mode
-            if mode == 'score':
-                score=show_score(block_count)
-                state='Your score: '+str(score)
-            elif mode == 'time':
-                score=show_time(start)
-                if score>20:
-                    state='You won'
-                    gameOver=True
-            
-            #how to manage code (score) if we have those bonuses??
-            #write instructions about modes, what each one does etc
+        #how to manage code (score) if we have those bonuses??
+        #write instructions about modes, what each one does etc
+        #already one of modes is chosen in the beginning
 
  
         pygame.display.update()
