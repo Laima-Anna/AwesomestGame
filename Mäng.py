@@ -12,6 +12,7 @@ white = (255, 255, 255)
 black = (0, 0, 0)
 red = (255, 0, 0)
 grey = (220, 220, 220)
+darkgrey = (119,136,153)
 
 FPS = 30
 
@@ -37,8 +38,6 @@ font = pygame.font.SysFont(None, 40)
 center_x = display_width/2
 center_y = display_height/2
 
-
-
 def show_time(start):
     new_time=time.time()-start
     message(str(round(new_time)), white, -display_height/2+40,display_width-len(str(round(new_time)))*10-10)
@@ -60,7 +59,11 @@ def message(msg, color, y_displace=0, center_x=center_x, center_y=center_y):
     textSurf, textRect = textObjects(msg, color)
     textRect.center = (center_x), (center_y)+y_displace
     gameDisplay.blit(textSurf, textRect)
-
+    
+def button(text, color, x, y, width, height):
+    pygame.draw.rect(gameDisplay, color, (x, y, width, height))
+    message(text, black, 0, x+width/2, y+height/2)
+    
 #Start screen
 def gameIntro():
     intro = True
@@ -68,20 +71,39 @@ def gameIntro():
     #Button dimensions
     button_x = 140
     button_y = 50
-    button_loc_y = display_height/2+100
+    button_loc_y = display_height/2+200
     mediumButton_x = display_width/2-button_x/2
     easyButton_x = mediumButton_x-200
     hardButton_x = mediumButton_x+200
+    
+    timeMode_x = display_width/2 -200
+    scoreMode_x = display_width/2 + 50
+    modeButton_y = display_height/2
+    
+    scorecolor = grey
+    timecolor = grey
     
     while intro:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                quit()
                     
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x = pygame.mouse.get_pos()[0]
                 mouse_y = pygame.mouse.get_pos()[1]
+                
+                #when one of the mode buttons is clicked, it changes color + mode is chosen
+                if (timeMode_x < mouse_x < timeMode_x+button_x) and (modeButton_y < mouse_y < modeButton_y + button_y):
+                    timecolor = darkgrey
+                    scorecolor = grey
+                    mode = 'time'
+                    
+                if (scoreMode_x < mouse_x < scoreMode_x+button_x) and (modeButton_y < mouse_y < modeButton_y + button_y):
+                    timecolor = grey
+                    scorecolor = darkgrey
+                    mode = 'score'
+                    
+                #Choose which level you want to play
                 if (easyButton_x < mouse_x < easyButton_x + button_x) and (button_loc_y < mouse_y < button_loc_y + button_y):
                     level = 'easy'
                     intro = False
@@ -91,27 +113,26 @@ def gameIntro():
                 if (hardButton_x < mouse_x < hardButton_x + button_x) and (button_loc_y < mouse_y < button_loc_y + button_y):
                     level = 'hard'
                     intro = False
-        
+                    
         gameDisplay.blit(bg, (0,0))
 
-        message("Mängu eesmärgiks on hoida oma kosmoselaev tervena.", white, -100)
+        message("The aim of the game is to avoid fireballs", white, -100)
+        message("Choose your game mode", white, -50)
+
+        button("Time", timecolor, timeMode_x, modeButton_y, button_x, button_y)
+        button("Score", scorecolor, scoreMode_x, modeButton_y, button_x, button_y)
         
-        easyButton = pygame.draw.rect(gameDisplay, grey,
-                                      (easyButton_x,button_loc_y, button_x, button_y))
-        mediumButton = pygame.draw.rect(gameDisplay, grey,
-                                        (mediumButton_x,button_loc_y, button_x, button_y))
-        hardButton = pygame.draw.rect(gameDisplay, grey,
-                                      (hardButton_x,button_loc_y, button_x, button_y))
+        message("Choose your level", white, +150)
         
-        message("Lihtne", black, 0, easyButton_x+button_x/2, button_loc_y+button_y/2)
-        message("Keskmine", black, 0, mediumButton_x+button_x/2, button_loc_y+button_y/2)
-        message("Raske", black, 0, hardButton_x+button_x/2, button_loc_y+button_y/2)
+        button("Easy", grey, easyButton_x, button_loc_y, button_x, button_y)
+        button("Medium", grey, mediumButton_x, button_loc_y, button_x, button_y)
+        button("Hard", grey, hardButton_x, button_loc_y, button_x, button_y)
         
         pygame.display.update()
         clock.tick(FPS)
-    return level
+    return level, mode
     
-def gameLoop(level):
+def gameLoop(level, mode):
     gameExit = False
     gameOver = False
 
@@ -147,8 +168,7 @@ def gameLoop(level):
                         gameOver = False
                     if event.key == pygame.K_c:
                         start=time.time()
-                        gameLoop(level)
-                        
+                        gameLoop(level, mode)       
             
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -165,8 +185,6 @@ def gameLoop(level):
             #Add player movement with mouse/touchpad
             if event.type == pygame.MOUSEMOTION:
                 lead_x = event.pos[0]-(size_x/2) #cursor in the middle of spaceship
-        
-        
         
         lead_x += lead_x_change
         
@@ -234,30 +252,29 @@ def gameLoop(level):
             
             #collision
             if lead_x>i[0] and lead_x<i[0]+i[2] or lead_x+size_x>i[0] and lead_x+size_x<i[0]+i[2] or lead_x<i[0] and lead_x+size_x>i[0]+i[2]:
-                if lead_y>i[1] and lead_y<i[1]+i[2] or lead_y+size_y>i[1] and lead_y+size_y<i[1]+i[2]:
+                if lead_y>i[1] and lead_y<i[1]+i[3] or lead_y+size_y>i[1] and lead_y+size_y<i[1]+i[3]:
                     #print(numb)
                     #numb+=1
                     gameOver=True
-                 
-            #other mode
-##            if mode=='other?':
-            score=show_score(block_count)
-            state='Your score: '+str(score)
+            
+            #Show score according to chosen mode
+            if mode == 'score':
+                score=show_score(block_count)
+                state='Your score: '+str(score)
+            elif mode == 'time':
+                score=show_time(start)
+                if score>20:
+                    state='You won'
+                    gameOver=True
             
             #how to manage code (score) if we have those bonuses??
             #write instructions about modes, what each one does etc
-                
-            #time mode
-##            if mode=='time':
-##                score=show_time(start)
-##                if score>20:
-##                    state='You won'
-##                    gameOver=True
+
  
         pygame.display.update()
         clock.tick(FPS)
             
     pygame.quit()
 
-level=gameIntro()
-gameLoop(level)
+level, mode = gameIntro()
+gameLoop(level, mode)
