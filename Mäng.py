@@ -23,6 +23,11 @@ bg = pygame.image.load("space.jpg")
 gameDisplay = pygame.display.set_mode((display_width,display_height))
 player = pygame.image.load("spaceship.png").convert_alpha()
 
+ghost_image = pygame.image.load("ghost.png").convert_alpha()
+ghost_width = int(ghost_image.get_size()[0]/7)
+ghost_height = int(ghost_image.get_size()[1]/7)
+ghost = pygame.transform.scale(ghost_image, (ghost_width, ghost_height))
+
 #Our player width and height
 size_x = int(player.get_size()[0]/10)
 size_y = int(player.get_size()[1]/10)
@@ -68,7 +73,7 @@ def button(text, color, x, y, width, height):
 def gameIntro():
     intro = True
     level = ''
-    mode = ''
+    mode = 'time'
     #Button dimensions
     button_x = 140
     button_y = 50
@@ -82,7 +87,7 @@ def gameIntro():
     modeButton_y = display_height/2
     
     scorecolor = grey
-    timecolor = grey                    
+    timecolor = darkgrey                    
     
     while intro:
         for event in pygame.event.get():
@@ -124,9 +129,6 @@ def gameIntro():
         button("Time", timecolor, timeMode_x, modeButton_y, button_x, button_y)
         button("Score", scorecolor, scoreMode_x, modeButton_y, button_x, button_y)
         
-        if mode == '':
-            message("Please choose mode first!", red, +100)
-        
         message("Choose your level", white, +150)
         
         button("Easy", grey, easyButton_x, button_loc_y, button_x, button_y)
@@ -147,6 +149,7 @@ def gameLoop(level, mode):
     lead_y_change = 0  
     
     start_time=time.time()
+    ghost_time=time.time() #ghost start time
     numb=0
     blocks=[]
     block_count = 0
@@ -155,8 +158,16 @@ def gameLoop(level, mode):
     fireball_width = fireball.get_size()[0]
     fireball_height = fireball.get_size()[1]
     
+    ghost_x = randrange(0,display_width - ghost_width)
+    ghost_y = 0 - ghost_width
+    
     state='Game Over'
     start=time.time()
+    
+    #variable for how long immunity lasts
+    immunity_time = time.time()
+    immunity = False
+    ghost_frequency = randint(10,20)
     
     while not gameExit:
         while gameOver:
@@ -256,20 +267,41 @@ def gameLoop(level, mode):
             print(blocks)
                
             #collision
-            if lead_x>i[0] and lead_x<i[0]+i[2] or lead_x+size_x>i[0] and lead_x+size_x<i[0]+i[2] or lead_x<i[0] and lead_x+size_x>i[0]+i[2]:
-                if lead_y>i[1] and lead_y<i[1]+i[3] or lead_y+size_y>i[1] and lead_y+size_y<i[1]+i[3]:
-                    #print(numb)
-                    #numb+=1
-                    gameOver=True
-          
-          
+            if immunity == False:
+                if lead_x>i[0] and lead_x<i[0]+i[2] or lead_x+size_x>i[0] and lead_x+size_x<i[0]+i[2] or lead_x<i[0] and lead_x+size_x>i[0]+i[2]:
+                    if lead_y>i[1] and lead_y<i[1]+i[3] or lead_y+size_y>i[1] and lead_y+size_y<i[1]+i[3]:
+                        #print(numb)
+                        #numb+=1
+                        gameOver=True
+        
+        #ghost appears and offers immunity
+        if time.time() - ghost_time > ghost_frequency:
+            ghost_frequency = randint(10,20)
+            ghost_time=time.time()
+        
+            ghost_x = randrange(0,display_width - ghost_width)
+            ghost_y = 0 - ghost_width
+        
+        gameDisplay.blit(ghost, (ghost_x,ghost_y))
+        ghost_y += 10
+        
+        
+        #Ghost collision gives player immunity for five seconds
+        if lead_x>ghost_x and lead_x<ghost_x+ghost_width or lead_x+size_x>ghost_x and lead_x+size_x<ghost_x+ghost_width or lead_x<ghost_x and lead_x+size_x>ghost_x+ghost_width:
+                if lead_y>ghost_y and lead_y<ghost_y+ghost_height or lead_y+size_y>ghost_y and lead_y+size_y<ghost_y+ghost_height:
+                    immunity = True
+                    immunity_time = time.time()
+                    ghost_y = display_height
+        if time.time() - immunity_time > 5:
+            immunity = False
+            
         #Show score according to chosen mode
         if mode == 'score':
             score=show_score(block_count)
             state='Your score: '+str(score)
         elif mode == 'time':
             score=show_time(start)
-            if score>20:
+            if score>30:
                 state='You won'
                 gameOver=True
             
