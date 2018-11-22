@@ -28,6 +28,26 @@ ghost_width = int(ghost_image.get_size()[0]/7)
 ghost_height = int(ghost_image.get_size()[1]/7)
 ghost = pygame.transform.scale(ghost_image, (ghost_width, ghost_height))
 
+gift_image = pygame.image.load("gift.png").convert_alpha()
+gift_width = int(gift_image.get_size()[0]/7/1.8)
+gift_height = int(gift_image.get_size()[1]/7/1.8)
+gift = pygame.transform.scale(gift_image, (gift_width, gift_height))
+
+plus_image = pygame.image.load("plus.png").convert_alpha()
+plus_width = int(plus_image.get_size()[0]/1.5)
+plus_height = int(plus_image.get_size()[1]/1.5)
+plus = pygame.transform.scale(plus_image, (plus_width, plus_height))
+
+minus_image = pygame.image.load("minus.png").convert_alpha()
+minus_width = int(minus_image.get_size()[0]/1.5)
+minus_height = int(minus_image.get_size()[1]/1.5)
+minus = pygame.transform.scale(minus_image, (minus_width, minus_height))
+
+angryface_image = pygame.image.load("angryface.png").convert_alpha()
+angryface_width = int(angryface_image.get_size()[0]/1.5)
+angryface_height = int(angryface_image.get_size()[1]/1.5)
+angryface = pygame.transform.scale(angryface_image, (angryface_width, angryface_height))
+
 #Our player width and height
 size_x = int(player.get_size()[0]/10)
 size_y = int(player.get_size()[1]/10)
@@ -291,7 +311,10 @@ def gameLoop(level, mode):
         gameDisplay.blit(ghost, (ghost_x,ghost_y))
         ghost_y += 10
         
-        
+        gameDisplay.blit(gift, (50,50))
+        gameDisplay.blit(plus, (150,150))
+        gameDisplay.blit(minus, (100,100))
+        gameDisplay.blit(angryface, (200,200))
         #Ghost collision gives player immunity for five seconds
         if lead_x>ghost_x and lead_x<ghost_x+ghost_width or lead_x+size_x>ghost_x and lead_x+size_x<ghost_x+ghost_width or lead_x<ghost_x and lead_x+size_x>ghost_x+ghost_width:
                 if lead_y>ghost_y and lead_y<ghost_y+ghost_height or lead_y+size_y>ghost_y and lead_y+size_y<ghost_y+ghost_height:
