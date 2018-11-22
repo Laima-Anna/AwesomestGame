@@ -44,8 +44,6 @@ center_x = display_width/2
 center_y = display_height/2
 
 def drawing_by_level(blocks, fireball_width,fireball_height, speed_min, speed_max):
-    
-    
     s = randint(5, 25)
     fireball_x = int(fireball_width/s)
     fireball_y = int(fireball_height/s)
@@ -57,28 +55,38 @@ def drawing_by_level(blocks, fireball_width,fireball_height, speed_min, speed_ma
 
 def show_time(start):
     new_time=time.time()-start
-    message(str(round(new_time)), white, -display_height/2+40,display_width-len(str(round(new_time)))*10-10)
-
+    text=str(round(new_time))
+    text_width, text_height = font.size(text)
+    message(display_width-text_width-20, 20, text, white)
     return new_time
 
 def show_score(count):
-    message(str(count), white, -display_height/2+40,display_width-len(str(count))*10-10)
-
+    text=str(count)
+    text_width, text_height = font.size(text)
+    message(display_width-text_width-20, 20, text, white)
     return count
+
+def show_bonus(type, number):
+    text=type+': '+str(number)
+    message(20,20,text,white)
+    
+
+def message(x,y,tekst,color):
+    textsurface = font.render(tekst, True, color)
+    gameDisplay.blit(textsurface,(x,y))
 
 #Two functions for displaying text on screen
 def textObjects (text, color):
     textSurface = font.render(text, True, color)
     return textSurface, textSurface.get_rect()
-
-def message(msg, color, y_displace=0, center_x=center_x, center_y=center_y):
+def message_center(msg, color, y_displace=0, center_x=center_x, center_y=center_y,a=1):
     textSurf, textRect = textObjects(msg, color)
     textRect.center = (center_x), (center_y)+y_displace
     gameDisplay.blit(textSurf, textRect)
     
 def button(text, color, x, y, width, height):
     pygame.draw.rect(gameDisplay, color, (x, y, width, height))
-    message(text, black, 0, x+width/2, y+height/2)
+    message_center(text, black, 0, x+width/2, y+height/2)
     
 #Start screen
 def gameIntro():
@@ -134,13 +142,13 @@ def gameIntro():
                     
         gameDisplay.blit(bg, (0,0))
 
-        message("The aim of the game is to avoid fireballs", white, -100)
-        message("Choose your game mode", white, -50)
+        message_center("The aim of the game is to avoid fireballs", white, -100)
+        message_center("Choose your game mode", white, -50)
 
         button("Time", timecolor, timeMode_x, modeButton_y, button_x, button_y)
         button("Score", scorecolor, scoreMode_x, modeButton_y, button_x, button_y)
         
-        message("Choose your level", white, +150)
+        message_center("Choose your level", white, +150)
         
         button("Easy", grey, easyButton_x, button_loc_y, button_x, button_y)
         button("Medium", grey, mediumButton_x, button_loc_y, button_x, button_y)
@@ -180,9 +188,15 @@ def gameLoop(level, mode):
     immunity = False
     ghost_frequency = randint(10,20)
     
+    bonus_visibility=False
+    bonus_type=''
+    bonus_time=0
+    bonus_start_time=0
+    bonus_max_time=0
+    
     while not gameExit:
         while gameOver:
-            message(state+', press C to play again or Q to quit', white)
+            message_center(state+', press C to play again or Q to quit', white)
             pygame.display.update()
             
             for event in pygame.event.get():
@@ -284,9 +298,20 @@ def gameLoop(level, mode):
                     immunity = True
                     immunity_time = time.time()
                     ghost_y = display_height
+                    bonus_visibility=True
+                    bonus_type='Immunity'
+                    bonus_start_time=time.time()
+                    bonus_max_time=5
         if time.time() - immunity_time > 5:
             immunity = False
-            
+            bonus_visibility= False
+        
+        if bonus_visibility==True:
+            bonus_time=bonus_max_time-round(time.time()-bonus_start_time)
+            show_bonus(bonus_type, bonus_time)
+        
+        
+        
         #Show score according to chosen mode
         if mode == 'score':
             score=show_score(block_count)
