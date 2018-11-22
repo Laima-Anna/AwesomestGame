@@ -43,16 +43,27 @@ font = pygame.font.SysFont(None, 40)
 center_x = display_width/2
 center_y = display_height/2
 
+def drawing_by_level(blocks, fireball_width,fireball_height, speed_min, speed_max):
+    
+    
+    s = randint(5, 25)
+    fireball_x = int(fireball_width/s)
+    fireball_y = int(fireball_height/s)
+    x=randrange(0,display_width - fireball_x)
+    speed=randint(speed_min,speed_max)
+    y=0-fireball_y
+    blocks+=[[x,y, fireball_x, fireball_y,speed]]
+    return blocks
+
 def show_time(start):
     new_time=time.time()-start
     message(str(round(new_time)), white, -display_height/2+40,display_width-len(str(round(new_time)))*10-10)
-    #here as well bonuses
-    #score showing in one function?
+
     return new_time
 
 def show_score(count):
     message(str(count), white, -display_height/2+40,display_width-len(str(count))*10-10)
-    #here should be score addition when there are bonuses
+
     return count
 
 #Two functions for displaying text on screen
@@ -203,46 +214,27 @@ def gameLoop(level, mode):
                 lead_x = event.pos[0]-(size_x/2) #cursor in the middle of spaceship
         
         lead_x += lead_x_change
-        
-        ## make as a function variables in if statements???
+
         
         if level=='easy':
-            #A new fireball appears after every two seconds
+            #A new fireball appears after every n seconds
             if time.time() -start_time > 2:
                 start_time=time.time()
-                #make fireball dimensions correct
-                s = randint(5, 25)
-                fireball_x = int(fireball_width/s)
-                fireball_y = int(fireball_height/s)
-                x=randrange(0,display_width - fireball_x)
-                speed=randint(5,20)
-                y=0-fireball_y
-                blocks+=[[x,y, fireball_x, fireball_y,speed]]
+                drawing_by_level(blocks, fireball_width,fireball_height, 5, 20)
+            
         
         elif level=='medium':
             #A new fireball appears after every 1 second
             if time.time() -start_time > 1:
                 start_time=time.time()
-                #make fireball dimensions correct
-                s = randint(5, 25)
-                fireball_x = int(fireball_width/s)
-                fireball_y = int(fireball_height/s)
-                x=randrange(0,display_width - fireball_x)
-                speed=randint(10,30)
-                y=0-fireball_y
-                blocks+=[[x,y, fireball_x, fireball_y,speed]]
+                drawing_by_level(blocks, fireball_width,fireball_height, 10, 30)
+               
         elif level=='hard':
             #A new fireball appears after every two seconds
             if time.time() -start_time > 0.5:
                 start_time=time.time()
-                #make fireball dimensions correct
-                s = randint(5, 25)
-                fireball_x = int(fireball_width/s)
-                fireball_y = int(fireball_height/s)
-                x=randrange(0,display_width - fireball_x)
-                speed=randint(15,40)
-                y=0-fireball_y
-                blocks+=[[x,y, fireball_x, fireball_y,speed]]
+                drawing_by_level(blocks, fireball_width,fireball_height, 15, 40)
+
              
         #Make sure that player cannot move outside the edge of the screen
         if lead_x >= display_width - size_x:
@@ -304,12 +296,7 @@ def gameLoop(level, mode):
             if score>30:
                 state='You won'
                 gameOver=True
-            
-        #how to manage code (score) if we have those bonuses??
-        #write instructions about modes, what each one does etc
-        #already one of modes is chosen in the beginning
-
- 
+             
         pygame.display.update()
         clock.tick(FPS)
             
