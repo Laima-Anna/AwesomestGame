@@ -21,37 +21,21 @@ display_height = 600
 
 bg = pygame.image.load("space.jpg")
 gameDisplay = pygame.display.set_mode((display_width,display_height))
-player = pygame.image.load("spaceship.png").convert_alpha()
 
-ghost_image = pygame.image.load("ghost.png").convert_alpha()
-ghost_width = int(ghost_image.get_size()[0]/7)
-ghost_height = int(ghost_image.get_size()[1]/7)
-ghost = pygame.transform.scale(ghost_image, (ghost_width, ghost_height))
+def picture_resize(image_name, divider):
+    picture = pygame.image.load(image_name).convert_alpha()
+    width = int(picture.get_size()[0]/divider)
+    height = int(picture.get_size()[1]/divider)
+    pic_icon = pygame.transform.scale(picture, (width, height))
+    
+    return pic_icon, width, height
 
-gift_image = pygame.image.load("gift.png").convert_alpha()
-gift_width = int(gift_image.get_size()[0]/7/1.8)
-gift_height = int(gift_image.get_size()[1]/7/1.8)
-gift = pygame.transform.scale(gift_image, (gift_width, gift_height))
-
-plus_image = pygame.image.load("plus.png").convert_alpha()
-plus_width = int(plus_image.get_size()[0]/1.5)
-plus_height = int(plus_image.get_size()[1]/1.5)
-plus = pygame.transform.scale(plus_image, (plus_width, plus_height))
-
-minus_image = pygame.image.load("minus.png").convert_alpha()
-minus_width = int(minus_image.get_size()[0]/1.5)
-minus_height = int(minus_image.get_size()[1]/1.5)
-minus = pygame.transform.scale(minus_image, (minus_width, minus_height))
-
-angryface_image = pygame.image.load("angryface.png").convert_alpha()
-angryface_width = int(angryface_image.get_size()[0]/1.5)
-angryface_height = int(angryface_image.get_size()[1]/1.5)
-angryface = pygame.transform.scale(angryface_image, (angryface_width, angryface_height))
-
-#Our player width and height
-size_x = int(player.get_size()[0]/10)
-size_y = int(player.get_size()[1]/10)
-player = pygame.transform.scale(player, (size_x, size_y))
+player, size_x, size_y = picture_resize("spaceship.png", 10)
+angryface, angryface_width, angryface_height = picture_resize("angryface.png", 1.5)
+minus, minus_width, minus_height = picture_resize("minus.png", 1.5)
+plus, plus_width, plus_height = picture_resize("plus.png", 1.5)
+gift, gift_width, gift_height = picture_resize("gift.png", 12.6)
+ghost, ghost_width, ghost_height = picture_resize("ghost.png", 7)
 
 pygame.display.set_caption('Mäng')
 
@@ -90,7 +74,6 @@ def show_bonus(type, number):
     text=type+': '+str(number)
     message(20,20,text,white)
     
-
 def message(x,y,tekst,color):
     textsurface = font.render(tekst, True, color)
     gameDisplay.blit(textsurface,(x,y))
@@ -249,14 +232,12 @@ def gameLoop(level, mode):
         
         lead_x += lead_x_change
 
-        
         if level=='easy':
             #A new fireball appears after every n seconds
             if time.time() -start_time > 2:
                 start_time=time.time()
                 drawing_by_level(blocks, fireball_width,fireball_height, 5, 20)
             
-        
         elif level=='medium':
             #A new fireball appears after every 1 second
             if time.time() -start_time > 1:
@@ -269,7 +250,6 @@ def gameLoop(level, mode):
                 start_time=time.time()
                 drawing_by_level(blocks, fireball_width,fireball_height, 15, 40)
 
-             
         #Make sure that player cannot move outside the edge of the screen
         if lead_x >= display_width - size_x:
             lead_x = display_width - size_x
@@ -332,8 +312,6 @@ def gameLoop(level, mode):
         if bonus_visibility==True:
             bonus_time=bonus_max_time-round(time.time()-bonus_start_time)
             show_bonus(bonus_type, bonus_time)
-        
-        
         
         #Show score according to chosen mode
         if mode == 'score':
