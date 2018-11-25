@@ -31,7 +31,7 @@ def picture_resize(image_name, divider):
     return pic_icon, width, height
 
 player, size_x, size_y = picture_resize("spaceship.png", 10)
-angryface, angryface_width, angryface_height = picture_resize("angryface.png", 1.5)
+angry, angry_width, angry_height = picture_resize("angryface.png", 1.5)
 minus, minus_width, minus_height = picture_resize("minus.png", 1.5)
 plus, plus_width, plus_height = picture_resize("plus.png", 1.5)
 gift, gift_width, gift_height = picture_resize("gift.png", 12.6)
@@ -80,7 +80,7 @@ def message(x,y,tekst,color):
     textsurface = font.render(tekst, True, color)
     gameDisplay.blit(textsurface,(x,y))
 
-#Two functions for displaying text on screen
+#Two functions for displaying text on center of screen
 def textObjects (text, color):
     textSurface = font.render(text, True, color)
     return textSurface, textSurface.get_rect()
@@ -176,9 +176,7 @@ def gameLoop(level, mode):
     blocks=[]
     block_count = 0
     
-    fireball = pygame.image.load("fireball.png").convert_alpha()
-    fireball_width = fireball.get_size()[0]
-    fireball_height = fireball.get_size()[1]
+    fireball, fireball_width, fireball_height = picture_resize("fireball.png", 1)
     
     state='Game Over'
     start=time.time()
@@ -198,6 +196,24 @@ def gameLoop(level, mode):
     #minus_y = 0 - minus_width -200
     slower_speed= False
     minus_immunity_time = time.time()
+    
+    
+    angry_frequency = randint(10,20)
+    angry_time=time.time() 
+    angry_x = randrange(0,display_width - angry_width)
+    angry_y = 0 - angry_width - randint(500,5000)
+    angry_appearance_time = time.time()
+    angry_appearance = False
+    
+    
+    gift_frequency = randint(10,20)
+    gift_time=time.time() 
+    gift_x = randrange(0,display_width - gift_width)
+    gift_y = 0 - gift_width - randint(500,5000)
+    gift_appearance_time = time.time()
+    gift_appearance = False
+    
+    
 
     #variable for how long immunity lasts
     ghost_immunity_time = time.time()
@@ -305,9 +321,6 @@ def gameLoop(level, mode):
                         #numb+=1
                         gameOver=True
         
-        #gameDisplay.blit(gift, (50,50))
-        #gameDisplay.blit(angryface, (200,200))
-        
         #-------------------plus-------------------------
         #plus appears after random amount of time
         if time.time() - plus_time > plus_frequency:
@@ -398,7 +411,61 @@ def gameLoop(level, mode):
                 
         if bonus_visibility==True:
             show_bonus(bonus_list, bonus_max_time)
+            
+        #If chosen mode is 'score', show two more bonuses    
+        if mode == 'score':
+            if time.time() - angry_time > angry_frequency:
+                angry_frequency = randint(10,20)
+                angry_time=time.time()
+                angry_x = randrange(0,display_width - angry_width)
+                angry_y = 0 - angry_width
+                
+            gameDisplay.blit(angry, (angry_x, angry_y))
+            angry_y += 10
+            
+            #Colliding with angry face decreases score points
+            if lead_x>angry_x and lead_x<angry_x+angry_width or lead_x+size_x>angry_x and \
+            lead_x+size_x<angry_x+angry_width or lead_x<angry_x and lead_x+size_x>angry_x+angry_width:
+                if lead_y>angry_y and lead_y<angry_y+angry_height or lead_y+size_y>angry_y and \
+                lead_y+size_y<angry_y+angry_height:
+                    
+                    angry_appearance = True
+                    angry_appearance_time = time.time()
+                    angry_y = display_height
+                    block_count = block_count-5
+                    
+            if angry_appearance == True:
+                message(display_width-200, display_height-580, 'Score: -5', white)
+                
+                if time.time() - angry_appearance_time > 3:
+                    angry_appearance = False
+                    
+            if time.time() - gift_time > gift_frequency:
+                gift_frequency = randint(10,20)
+                gift_time=time.time()
+                gift_x = randrange(0,display_width - gift_width)
+                gift_y = 0 - gift_width
+                
+            gameDisplay.blit(gift, (gift_x, gift_y))
+            gift_y += 10
         
+            #Gift increases score by 5 points
+            if lead_x > gift_x and lead_x < gift_x + gift_width or lead_x+size_x > gift_x and \
+            lead_x+size_x < gift_x+gift_width or lead_x < gift_x and lead_x+size_x > gift_x+gift_width:
+                if lead_y>gift_y and lead_y<gift_y+gift_height or lead_y+size_y>gift_y and \
+                lead_y+size_y<gift_y+gift_height:
+                    
+                    gift_appearance = True
+                    gift_appearance_time = time.time()
+                    gift_y = display_height
+                    block_count = block_count+5
+                    
+            if gift_appearance == True:
+                message(display_width-200, display_height-580, 'Score: +5', white)
+                
+                if time.time() - gift_appearance_time > 3:
+                    gift_appearance = False
+                    
         #Show score according to chosen mode
         if mode == 'score':
             score=show_score(block_count)
