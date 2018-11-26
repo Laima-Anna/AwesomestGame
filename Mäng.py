@@ -21,6 +21,7 @@ display_height = 600
 
 bg = pygame.image.load("space.jpg")
 gameDisplay = pygame.display.set_mode((display_width,display_height))
+helpDisplay = pygame.display.set_mode((display_width,display_height))
 
 def picture_resize(image_name, divider):
     picture = pygame.image.load(image_name).convert_alpha()
@@ -47,8 +48,7 @@ font = pygame.font.SysFont(None, 40)
 center_x = display_width/2
 center_y = display_height/2
 
-button_x = 140
-button_y = 50
+
 
 def drawing_by_level(blocks, fireball_width,fireball_height, speed_min, speed_max):
     s = randint(5, 25)
@@ -102,6 +102,9 @@ def gameIntro():
     level = ''
     mode = 'time'
     
+    button_x = 140
+    button_y = 50
+    
     button_loc_y = display_height/2+200
     mediumButton_x = display_width/2-button_x/2
     easyButton_x = mediumButton_x-200
@@ -151,6 +154,7 @@ def gameIntro():
                 #What happens when you click Help button
                 if (help_x < mouse_x < help_x + button_x) and (help_y < mouse_y < help_y + button_y):
                     helpScreen()
+                    intro = False
                     
         gameDisplay.blit(bg, (0,0))
 
@@ -174,17 +178,21 @@ def gameIntro():
     return level, mode
 
 def helpScreen():
+    
+    
     exit = False
     
     x = 50
     y = 50
     
+    button_x = 140
+    button_y = 50
     go_back_x = display_width - 750
     go_back_y = display_height - 550
     
     while exit == False:
         
-        gameDisplay.blit(bg, (0,0))
+        
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -196,7 +204,9 @@ def helpScreen():
                 
                 if (go_back_x < mouse_x < go_back_x + button_x) and \
                 (go_back_y < mouse_y < go_back_y + button_y):
-                    gameIntro()
+                    exit = True
+                    
+        helpDisplay.blit(bg, (0,0))
         
         button("Go back", grey, go_back_x, go_back_y, button_x, button_y)
         
@@ -205,25 +215,29 @@ def helpScreen():
         message(x, y*4-10, "or collect as many points as possible on each level.", white)
         message(x*2, y*5, "There are some bonuses which you can collect:", white)
         
-        gameDisplay.blit(plus, (x, y*6))
+        helpDisplay.blit(plus, (x, y*6))
         message(x*2, y*6, "Makes the speed of fireballs faster for 5 seconds", white)
         
-        gameDisplay.blit(minus, (x, y*7))
+        helpDisplay.blit(minus, (x, y*7))
         message(x*2, y*7, "Makes the speed of fireballs slower for 5 seconds", white)
         
-        gameDisplay.blit(ghost, (x, y*8))
+        helpDisplay.blit(ghost, (x, y*8))
         message(x*2, y*8, "Gives you immunity from fireballs for 5 seconds", white)
         
         message(x*2, y*9, "Score mode has two extra bonuses: ", white)
         
-        gameDisplay.blit(angry, (x, y*10))
+        helpDisplay.blit(angry, (x, y*10))
         message(x*2, y*10, "Takes off 5 points from your score", white)
         
-        gameDisplay.blit(gift, (x, y*11))
+        helpDisplay.blit(gift, (x, y*11))
         message(x*2, y*11, "Adds 5 points to your score", white)
         
         pygame.display.update()
+    
+    
         clock.tick(FPS)
+    
+    level, mode = gameIntro()
     
 def gameLoop(level, mode):
     gameExit = False
