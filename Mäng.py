@@ -118,7 +118,9 @@ def gameIntro():
     modeButton_y = display_height/2
     
     scorecolor = grey
-    timecolor = darkgrey                    
+    timecolor = darkgrey
+    
+    print(intro)
     
     while intro:
         for event in pygame.event.get():
@@ -175,7 +177,8 @@ def gameIntro():
         pygame.display.update()
         clock.tick(FPS)
         
-    return level, mode
+    #return level, mode
+    gameLoop(level, mode)
 
 def helpScreen():
     
@@ -237,7 +240,7 @@ def helpScreen():
     
         clock.tick(FPS)
     
-    level, mode = gameIntro()
+    gameIntro()
     
 def gameLoop(level, mode):
     gameExit = False
@@ -303,6 +306,9 @@ def gameLoop(level, mode):
     bonus_list={}
     all_bonuses=set()
     all_bonuses_text=''
+    
+    print("levelmode " + mode)
+    print("level " + level)
     
     while not gameExit:
         while gameOver:
@@ -564,12 +570,12 @@ def gameLoop(level, mode):
             if score>30:
                 state='You won'
                 gameOver=True
-        print(bonus_list)
+        #print(bonus_list)
         
         pygame.display.update()
         clock.tick(FPS)
             
     pygame.quit()
 
-level, mode = gameIntro()
-gameLoop(level, mode)
+gameIntro()
+#gameLoop(level, mode)
