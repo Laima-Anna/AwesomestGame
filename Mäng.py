@@ -75,9 +75,14 @@ def show_score(count):
 
 def show_bonus(bonus_list,bonus_max_time):
     text=''
+    
     for j in bonus_list:
-        text=text+' '+j+' '+str(bonus_max_time-round(time.time()-bonus_list[j]))
+        if j == 'Score: -' or j == 'Score: +':
+            text=text+' '+j+' '+str(5)
+        else:
+            text=text+' '+j+' '+str(bonus_max_time-round(time.time()-bonus_list[j]))
     message(20,20,text,white)
+
     
 def message(x,y,tekst,color):
     textsurface = font.render(tekst, True, color)
@@ -119,8 +124,6 @@ def gameIntro():
     
     scorecolor = grey
     timecolor = darkgrey
-    
-    print(intro)
     
     while intro:
         for event in pygame.event.get():
@@ -302,13 +305,11 @@ def gameLoop(level, mode):
     bonus_type=''
     bonus_time=0
     bonus_start_time=0
-    bonus_max_time=0
+    bonus_max_time=5
     bonus_list={}
-    all_bonuses=set()
-    all_bonuses_text=''
     
-    print("levelmode " + mode)
-    print("level " + level)
+    score_visibility=False
+    score_list={}
     
     while not gameExit:
         while gameOver:
@@ -422,7 +423,7 @@ def gameLoop(level, mode):
                     plus_y = display_height
                     bonus_visibility=True
                     bonus_list['Speed ++ ']=time.time()
-                    bonus_max_time=5
+                    
         
         if faster_speed == True:  
             if time.time() - plus_immunity_time > 5:
@@ -453,7 +454,7 @@ def gameLoop(level, mode):
                     minus_y = display_height
                     bonus_visibility=True
                     bonus_list['Speed -- ']=time.time()
-                    bonus_max_time=5
+                    
         
         if slower_speed == True:  
             if time.time() - minus_immunity_time > 5:
@@ -486,7 +487,7 @@ def gameLoop(level, mode):
                     ghost_y = display_height
                     bonus_visibility=True
                     bonus_list['Immunity: ']=time.time()
-                    bonus_max_time=5
+                    
         
         if ghost_immunity == True:  
             if time.time() - ghost_immunity_time > 5:
@@ -495,10 +496,7 @@ def gameLoop(level, mode):
                 
                 if not bonus_list:
                     bonus_visibility= False
-        
-        #------------------------------------------------
-                
-        #now the bonus max time is the same for every bonus!!!
+                    
                 
         if bonus_visibility==True:
             show_bonus(bonus_list, bonus_max_time)
@@ -514,6 +512,7 @@ def gameLoop(level, mode):
                 angry_x = randrange(0,display_width - angry_width)
                 angry_y = 0 - angry_width
                 
+                
             gameDisplay.blit(angry, (angry_x, angry_y))
             angry_y += 10
             
@@ -528,11 +527,18 @@ def gameLoop(level, mode):
                     angry_y = display_height
                     block_count = block_count-5
                     
+                    bonus_list['Score: -'] = 5
+                    bonus_visibility = True
+                    
+            
             if angry_appearance == True:
-                message(display_width-200, display_height-580, 'Score: -5', white)
-                
                 if time.time() - angry_appearance_time > 3:
                     angry_appearance = False
+                    del bonus_list['Score: -']
+                    if not bonus_list:
+                        bonus_visibility=False
+                        
+            
                     
             #-------------------gift-------------------------   
             if time.time() - gift_time > gift_frequency:
@@ -555,11 +561,19 @@ def gameLoop(level, mode):
                     gift_y = display_height
                     block_count = block_count+5
                     
+                    bonus_list['Score: +'] = 5
+                    bonus_visibility = True
+                    
+            
             if gift_appearance == True:
-                message(display_width-200, display_height-580, 'Score: +5', white)
-                
                 if time.time() - gift_appearance_time > 3:
                     gift_appearance = False
+                    
+                    del bonus_list['Score: +']
+                    if not bonus_list:
+                        bonus_visibility=False
+                            
+        
                     
         #Show score according to chosen mode
         if mode == 'score':
@@ -578,4 +592,3 @@ def gameLoop(level, mode):
     pygame.quit()
 
 gameIntro()
-#gameLoop(level, mode)
