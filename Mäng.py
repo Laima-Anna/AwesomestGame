@@ -10,7 +10,6 @@ pygame.init()
 
 white = (255, 255, 255)
 black = (0, 0, 0)
-red = (255, 0, 0)
 grey = (220, 220, 220)
 darkgrey = (119,136,153)
 
@@ -48,8 +47,6 @@ font = pygame.font.SysFont(None, 40)
 center_x = display_width/2
 center_y = display_height/2
 
-
-
 def drawing_by_level(blocks, fireball_width,fireball_height, speed_min, speed_max):
     s = randint(5, 25)
     fireball_x = int(fireball_width/s)
@@ -75,7 +72,6 @@ def show_score(count):
 
 def show_bonus(bonus_list,bonus_max_time):
     text=''
-    
     for j in bonus_list:
         if j == 'Score: -' or j == 'Score: +':
             text=text+' '+j+' '+str(5)
@@ -184,8 +180,6 @@ def gameIntro():
     gameLoop(level, mode)
 
 def helpScreen():
-    
-    
     exit = False
     
     x = 50
@@ -197,9 +191,6 @@ def helpScreen():
     go_back_y = display_height - 550
     
     while exit == False:
-        
-        
-        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -240,7 +231,6 @@ def helpScreen():
         
         pygame.display.update()
     
-    
         clock.tick(FPS)
     
     gameIntro()
@@ -252,40 +242,35 @@ def gameLoop(level, mode):
     lead_x = display_width/2
     lead_y = display_height-50
     lead_x_change = 0
-    lead_y_change = 0  
     
     start_time=time.time()
+    state='Game Over'
     blocks=[]
     block_count = 0
     
     fireball, fireball_width, fireball_height = picture_resize("fireball.png", 1)
-    
-    state='Game Over'
-    start=time.time()
-    
+
     plus_frequency = randint(10,20)
-    plus_time=time.time() #ghost start time
+    plus_time=time.time() #plus start time
     plus_x = randrange(0,display_width - plus_width)
     plus_y = 0 - plus_width - randint(500,5000)
-    #plus_y = 0 - plus_width 
-    faster_speed= False
     plus_immunity_time = time.time()
+    faster_speed= False
 
     minus_frequency = randint(10,20)
-    minus_time=time.time() #ghost start time
+    minus_time=time.time() #minus start time
     minus_x = randrange(0,display_width - minus_width)
     minus_y = 0 - minus_width - randint(500,5000)
-    #minus_y = 0 - minus_width -200
-    slower_speed= False
     minus_immunity_time = time.time()
+    slower_speed= False
     
     #variable for how long immunity lasts
-    ghost_immunity_time = time.time()
-    ghost_immunity = False
     ghost_frequency = randint(10,20)
     ghost_time=time.time() #ghost start time
     ghost_x = randrange(0,display_width - ghost_width)
     ghost_y = 0 - ghost_width - randint(500,5000)
+    ghost_immunity_time = time.time()
+    ghost_immunity = False
     
     angry_frequency = randint(10,20)
     angry_time=time.time() 
@@ -302,15 +287,9 @@ def gameLoop(level, mode):
     gift_appearance = False
     
     bonus_visibility=False
-    bonus_type=''
-    bonus_time=0
-    bonus_start_time=0
     bonus_max_time=5
     bonus_list={}
-    
-    score_visibility=False
-    score_list={}
-    
+
     while not gameExit:
         while gameOver:
             message_center(state+', press C to play again or Q to quit', white)
@@ -325,7 +304,6 @@ def gameLoop(level, mode):
                         gameExit = True
                         gameOver = False
                     if event.key == pygame.K_c:
-                        start=time.time()
                         gameLoop(level, mode)       
             
         for event in pygame.event.get():
@@ -380,9 +358,9 @@ def gameLoop(level, mode):
             if faster_speed==True and slower_speed==True or slower_speed==False and faster_speed==False:
                 i[1]+=i[4]
             elif faster_speed==True and slower_speed==False:
-                i[1]=i[1]+i[4]*1.1
+                i[1]=i[1]+i[4]*1.5
             elif slower_speed==True and faster_speed==False:
-                i[1]=i[1]+i[4]/2          
+                i[1]=i[1]+i[4]/2        
                 
             fireball_icon = pygame.transform.scale(fireball, (i[2], i[3]))
             gameDisplay.blit(fireball_icon, [i[0], i[1]])
@@ -390,7 +368,6 @@ def gameLoop(level, mode):
             if i[1]>display_height:
                 blocks.remove(i)
                 block_count+=1
-            #print(blocks)
                
             #collision
             if ghost_immunity == False:
@@ -398,17 +375,16 @@ def gameLoop(level, mode):
                 lead_x+size_x<i[0]+i[2] or lead_x<i[0] and lead_x+size_x>i[0]+i[2]:
                     if lead_y>i[1] and lead_y<i[1]+i[3] or lead_y+size_y>i[1] and \
                     lead_y+size_y<i[1]+i[3]:
-                        #print(numb)
-                        #numb+=1
                         gameOver=True
         
         #-------------------plus-------------------------
         #plus appears after random amount of time
         if time.time() - plus_time > plus_frequency:
-            plus_frequency = randint(10,20)
-            plus_time=time.time()
-            plus_x = randrange(0,display_width - plus_width)
-            plus_y = 0 - plus_width
+            if plus_y < 0 and plus_y > display_height: # checks whether plus is on the screen already or not
+                plus_frequency = randint(10,20)
+                plus_time=time.time()
+                plus_x = randrange(0,display_width - plus_width)
+                plus_y = 0 - plus_width
                 
         gameDisplay.blit(plus, (plus_x,plus_y))
         plus_y += 10
@@ -422,8 +398,7 @@ def gameLoop(level, mode):
                     faster_speed = True
                     plus_y = display_height
                     bonus_visibility=True
-                    bonus_list['Speed ++ ']=time.time()
-                    
+                    bonus_list['Speed ++ ']=time.time()     
         
         if faster_speed == True:  
             if time.time() - plus_immunity_time > 5:
@@ -436,10 +411,11 @@ def gameLoop(level, mode):
         #-------------------minus-------------------------       
         #minus appears after random amount of time
         if time.time() - minus_time > minus_frequency:
-            minus_frequency = randint(10,20)
-            minus_time=time.time()
-            minus_x = randrange(0,display_width - minus_width)
-            minus_y = 0 - minus_width
+            if minus_y < 0 and minus_y > display_height: # checks whether minus is on the screen already or not
+                minus_frequency = randint(10,20)
+                minus_time=time.time()
+                minus_x = randrange(0,display_width - minus_width)
+                minus_y = 0 - minus_width
                 
         gameDisplay.blit(minus, (minus_x,minus_y))
         minus_y += 10
@@ -455,24 +431,21 @@ def gameLoop(level, mode):
                     bonus_visibility=True
                     bonus_list['Speed -- ']=time.time()
                     
-        
         if slower_speed == True:  
             if time.time() - minus_immunity_time > 5:
                 slower_speed = False
                 del bonus_list['Speed -- ']
-                
                 if not bonus_list:
                     bonus_visibility= False
-        
-        #if for making it not appear again if the ghost or plus or minus is already on the screen!!!
         
         #-------------------ghost-------------------------
         #ghost appears and offers immunity
         if time.time() - ghost_time > ghost_frequency:
-            ghost_frequency = randint(10,20)
-            ghost_time=time.time()
-            ghost_x = randrange(0,display_width - ghost_width)
-            ghost_y = 0 - ghost_width
+            if ghost_y < 0 and ghost_y > display_height: # checks whether ghost is on the screen already or not
+                ghost_frequency = randint(10,20)
+                ghost_time=time.time()
+                ghost_x = randrange(0,display_width - ghost_width)
+                ghost_y = 0 - ghost_width
         
         gameDisplay.blit(ghost, (ghost_x,ghost_y))
         ghost_y += 10
@@ -486,8 +459,7 @@ def gameLoop(level, mode):
                     ghost_immunity_time = time.time()
                     ghost_y = display_height
                     bonus_visibility=True
-                    bonus_list['Immunity: ']=time.time()
-                    
+                    bonus_list['Immunity: ']=time.time()      
         
         if ghost_immunity == True:  
             if time.time() - ghost_immunity_time > 5:
@@ -496,22 +468,20 @@ def gameLoop(level, mode):
                 
                 if not bonus_list:
                     bonus_visibility= False
-                    
-                
+                           
         if bonus_visibility==True:
             show_bonus(bonus_list, bonus_max_time)
-            
-            
+               
         #If chosen mode is 'score', show two more bonuses    
         if mode == 'score':
             
             #-------------------angryface-------------------------
             if time.time() - angry_time > angry_frequency:
-                angry_frequency = randint(10,20)
-                angry_time=time.time()
-                angry_x = randrange(0,display_width - angry_width)
-                angry_y = 0 - angry_width
-                
+                if angry_y < 0 and angry_y > display_height: # checks whether angry is on the screen already or not
+                    angry_frequency = randint(10,20)
+                    angry_time=time.time()
+                    angry_x = randrange(0,display_width - angry_width)
+                    angry_y = 0 - angry_width
                 
             gameDisplay.blit(angry, (angry_x, angry_y))
             angry_y += 10
@@ -521,15 +491,12 @@ def gameLoop(level, mode):
             lead_x+size_x<angry_x+angry_width or lead_x<angry_x and lead_x+size_x>angry_x+angry_width:
                 if lead_y>angry_y and lead_y<angry_y+angry_height or lead_y+size_y>angry_y and \
                 lead_y+size_y<angry_y+angry_height:
-                    
                     angry_appearance = True
                     angry_appearance_time = time.time()
                     angry_y = display_height
                     block_count = block_count-5
-                    
                     bonus_list['Score: -'] = 5
                     bonus_visibility = True
-                    
             
             if angry_appearance == True:
                 if time.time() - angry_appearance_time > 3:
@@ -537,15 +504,14 @@ def gameLoop(level, mode):
                     del bonus_list['Score: -']
                     if not bonus_list:
                         bonus_visibility=False
-                        
-            
                     
             #-------------------gift-------------------------   
             if time.time() - gift_time > gift_frequency:
-                gift_frequency = randint(10,20)
-                gift_time=time.time()
-                gift_x = randrange(0,display_width - gift_width)
-                gift_y = 0 - gift_width
+                if gift_y < 0 and gift_y > display_height: # checks whether gift is on the screen already or not
+                    gift_frequency = randint(10,20)
+                    gift_time=time.time()
+                    gift_x = randrange(0,display_width - gift_width)
+                    gift_y = 0 - gift_width
                 
             gameDisplay.blit(gift, (gift_x, gift_y))
             gift_y += 10
@@ -555,25 +521,19 @@ def gameLoop(level, mode):
             lead_x+size_x < gift_x+gift_width or lead_x < gift_x and lead_x+size_x > gift_x+gift_width:
                 if lead_y>gift_y and lead_y<gift_y+gift_height or lead_y+size_y>gift_y and \
                 lead_y+size_y<gift_y+gift_height:
-                    
                     gift_appearance = True
                     gift_appearance_time = time.time()
                     gift_y = display_height
                     block_count = block_count+5
-                    
                     bonus_list['Score: +'] = 5
                     bonus_visibility = True
                     
-            
             if gift_appearance == True:
                 if time.time() - gift_appearance_time > 3:
                     gift_appearance = False
-                    
                     del bonus_list['Score: +']
                     if not bonus_list:
                         bonus_visibility=False
-                            
-        
                     
         #Show score according to chosen mode
         if mode == 'score':
@@ -584,7 +544,6 @@ def gameLoop(level, mode):
             if score>30:
                 state='You won'
                 gameOver=True
-        #print(bonus_list)
         
         pygame.display.update()
         clock.tick(FPS)
