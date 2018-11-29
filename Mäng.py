@@ -16,10 +16,11 @@ darkgrey = (119,136,153)
 display_width = 800
 display_height = 600
 
-bg = pygame.image.load("space.jpg")
+bg = pygame.image.load("space.jpg") #background picture
 gameDisplay = pygame.display.set_mode((display_width,display_height))
 helpDisplay = pygame.display.set_mode((display_width,display_height))
 
+#function for loading and resizing pictures
 def picture_resize(image_name, divider):
     picture = pygame.image.load(image_name).convert_alpha()
     width = int(picture.get_size()[0]/divider)
@@ -28,6 +29,7 @@ def picture_resize(image_name, divider):
     
     return pic_icon, width, height
 
+#load all necessary pictures and picture variables
 player, size_x, size_y = picture_resize("spaceship.png", 10)
 angry, angry_width, angry_height = picture_resize("angryface.png", 1.5)
 minus, minus_width, minus_height = picture_resize("minus.png", 1.5)
@@ -35,17 +37,18 @@ plus, plus_width, plus_height = picture_resize("plus.png", 1.5)
 gift, gift_width, gift_height = picture_resize("gift.png", 12.6)
 ghost, ghost_width, ghost_height = picture_resize("ghost.png", 7)
 
-pygame.display.set_caption('Mäng')
+pygame.display.set_caption('Mäng') #title of the screen
 
-clock = pygame.time.Clock()
+clock = pygame.time.Clock() #necessary for slowing down the game
 FPS = 30
 
-font = pygame.font.SysFont(None, 40)
+font = pygame.font.SysFont(None, 40) #general variable for font (size 40)
 
 #Variables for displaying text in center of screen
 center_x = display_width/2
 center_y = display_height/2
 
+#draws fireballs according to chosen level (different speed etc)
 def drawing_by_level(blocks, fireball_width,fireball_height, speed_min, speed_max):
     s = randint(5, 25)
     fireball_x = int(fireball_width/s)
@@ -56,6 +59,7 @@ def drawing_by_level(blocks, fireball_width,fireball_height, speed_min, speed_ma
     blocks+=[[x,y, fireball_x, fireball_y,speed]]
     return blocks
 
+#when mode is 'time', shows elapsed time in the upper right corner
 def show_time(start):
     new_time=time.time()-start
     text=str(round(new_time))
@@ -63,12 +67,14 @@ def show_time(start):
     message(display_width-text_width-20, 20, text, white)
     return new_time
 
+#when mode is 'score', shows score in the corner (score increases when you dodge a fireball successfully)
 def show_score(count):
     text=str(count)
     text_width, text_height = font.size(text)
     message(display_width-text_width-20, 20, text, white)
     return count
 
+#If you get a bonus, shows what bonus and how much time you have left in the corner
 def show_bonus(bonus_list,bonus_max_time):
     text=''
     for j in bonus_list:
@@ -78,12 +84,12 @@ def show_bonus(bonus_list,bonus_max_time):
             text=text+' '+j+' '+str(bonus_max_time-round(time.time()-bonus_list[j]))
     message(20,20,text,white)
 
-    
+#general function for displaying text
 def message(x,y,tekst,color):
     textsurface = font.render(tekst, True, color)
     gameDisplay.blit(textsurface,(x,y))
 
-#Two functions for displaying text on center of screen
+#Two functions for displaying text in center of screen
 def textObjects (text, color):
     textSurface = font.render(text, True, color)
     return textSurface, textSurface.get_rect()
@@ -92,6 +98,7 @@ def message_center(msg, color, y_displace=0, center_x=center_x, center_y=center_
     textRect.center = (center_x), (center_y)+y_displace
     gameDisplay.blit(textSurf, textRect)
     
+#function for drawing buttons with text in the center
 def button(text, color, x, y, width, height):
     pygame.draw.rect(gameDisplay, color, (x, y, width, height))
     message_center(text, black, 0, x+width/2, y+height/2)
@@ -100,8 +107,9 @@ def button(text, color, x, y, width, height):
 def gameIntro():
     intro = True
     level = ''
-    mode = 'time'
+    mode = 'time' #chosen by default
     
+    #different variables for different buttons
     button_x = 140
     button_y = 50
     
@@ -119,6 +127,7 @@ def gameIntro():
     scoreMode_x = display_width/2 + 50
     modeButton_y = display_height/2
     
+    #default colors for 'Time' and 'Score' buttons
     scorecolor = grey
     timecolor = darkgrey
     
@@ -126,6 +135,11 @@ def gameIntro():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+                
+            
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_q:
+                    pygame.quit()
                     
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x = pygame.mouse.get_pos()[0]
