@@ -213,8 +213,8 @@ def helpScreen():
         button("Go back", grey, go_back_x, go_back_y, button_x, button_y)
         
         message(x, y*2+10, "The game has two modes: time and score.", white)
-        message(x, y*3, "You can play each level a certain amount of time", white)
-        message(x, y*4-10, "or collect as many points as possible on each level.", white)
+        message(x, y*3, "You can play each level for 30 sec or collect as many", white)
+        message(x, y*4-10, "points as possible on each level.", white)
         message(x*2, y*5, "There are some bonuses which you can collect:", white)
         
         helpDisplay.blit(plus, (x, y*6))
@@ -324,6 +324,10 @@ def gameLoop(level, mode):
                                 won = False
                                 gameLoop(level, mode)
                             elif level == 'hard':
+                                level = 'ultra-hard'
+                                won = False
+                                gameLoop(level, mode)
+                            elif level == 'ultra-hard':
                                 message_center('You already played the hardest level!', white, 150)
                         
                         
@@ -364,6 +368,12 @@ def gameLoop(level, mode):
             if time.time() -start_time > 0.5:
                 start_time=time.time()
                 drawing_by_level(blocks, fireball_width,fireball_height, 15, 40)
+                
+        elif level=='ultra-hard':
+            #A new fireball appears after every two seconds
+            if time.time() -start_time > 0.3:
+                start_time=time.time()
+                drawing_by_level(blocks, fireball_width,fireball_height, 30, 50)
 
         #Make sure that player cannot move outside the edge of the screen
         if lead_x >= display_width - size_x:
@@ -564,7 +574,7 @@ def gameLoop(level, mode):
             state='Your score: '+str(score)
         elif mode == 'time':
             score=show_time(start)
-            if score>10:
+            if score>30:
                 state='You won'
                 gameOver=True
                 won = True
