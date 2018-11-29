@@ -26,7 +26,6 @@ def picture_resize(image_name, divider):
     width = int(picture.get_size()[0]/divider)
     height = int(picture.get_size()[1]/divider)
     pic_icon = pygame.transform.scale(picture, (width, height))
-    
     return pic_icon, width, height
 
 #load all necessary pictures and picture variables
@@ -276,14 +275,14 @@ def gameLoop(level, mode):
     plus_time=time.time() #plus start time
     plus_x = randrange(0,display_width - plus_width)
     plus_y = 0 - plus_width - randint(500,5000)
-    plus_immunity_time = time.time()
+    plus_immunity_time = 0
     plus_appearance = False
 
     minus_frequency = randint(10,20)
     minus_time=time.time() #minus start time
     minus_x = randrange(0,display_width - minus_width)
     minus_y = 0 - minus_width - randint(500,5000)
-    minus_immunity_time = time.time()
+    minus_immunity_time = 0
     minus_appearance = False
     
     #variable for how long immunity lasts
@@ -291,21 +290,21 @@ def gameLoop(level, mode):
     ghost_time=time.time() #ghost start time
     ghost_x = randrange(0,display_width - ghost_width)
     ghost_y = 0 - ghost_width - randint(500,5000)
-    ghost_immunity_time = time.time()
+    ghost_immunity_time = 0
     ghost_immunity = False
     
     angry_frequency = randint(10,20)
     angry_time=time.time() 
     angry_x = randrange(0,display_width - angry_width)
     angry_y = 0 - angry_width - randint(500,5000)
-    angry_immunity_time = time.time()
+    angry_immunity_time = 0
     faster_speed= False
     
     gift_frequency = randint(10,20)
     gift_time=time.time() 
     gift_x = randrange(0,display_width - gift_width)
     gift_y = 0 - gift_width - randint(500,5000)
-    gift_immunity_time = time.time()
+    gift_immunity_time = 0
     slower_speed= False
     
     bonus_visibility=False
@@ -555,7 +554,7 @@ def gameLoop(level, mode):
                     bonus_visibility = True
             
             if minus_appearance == True:
-                if time.time() - minus_immunity_time > 3:
+                if time.time() - minus_immunity_time > 5:
                     minus_appearance = False
                     del bonus_list['Score: -']
                     if not bonus_list:
@@ -585,7 +584,7 @@ def gameLoop(level, mode):
                     bonus_visibility = True
                     
             if plus_appearance == True:
-                if time.time() - plus_immunity_time > 3:
+                if time.time() - plus_immunity_time > 5:
                     plus_appearance = False
                     del bonus_list['Score: +']
                     if not bonus_list:
