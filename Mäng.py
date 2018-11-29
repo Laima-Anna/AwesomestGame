@@ -110,10 +110,10 @@ def gameIntro():
     easyButton_x = mediumButton_x-200
     hardButton_x = mediumButton_x+200
     
-    help_x = display_width-200
+    help_x = display_width-button_x-50
     help_y = display_height-550
-    quit_x = 200 - button_x
-    quit_y = help_y
+    quit_x = display_width-750
+    quit_y = display_height-550
     
     timeMode_x = display_width/2 -200
     scoreMode_x = display_width/2 + 50
@@ -217,22 +217,23 @@ def helpScreen():
         message(x, y*4-10, "points as possible on each level.", white)
         message(x*2, y*5, "There are some bonuses which you can collect:", white)
         
-        helpDisplay.blit(plus, (x, y*6))
+        helpDisplay.blit(angry, (x, y*6-4))
         message(x*2, y*6, "Makes the speed of fireballs faster for 5 seconds", white)
         
-        helpDisplay.blit(minus, (x, y*7))
+        helpDisplay.blit(gift, (x, y*7-4))
         message(x*2, y*7, "Makes the speed of fireballs slower for 5 seconds", white)
         
-        helpDisplay.blit(ghost, (x, y*8))
+        helpDisplay.blit(ghost, (x, y*8-3))
         message(x*2, y*8, "Gives you immunity from fireballs for 5 seconds", white)
         
         message(x*2, y*9, "Score mode has two extra bonuses: ", white)
         
-        helpDisplay.blit(angry, (x, y*10))
-        message(x*2, y*10, "Takes off 5 points from your score", white)
+        helpDisplay.blit(plus, (x, y*10-4))
+        message(x*2, y*10, "Adds 5 points to your score", white)
         
-        helpDisplay.blit(gift, (x, y*11))
-        message(x*2, y*11, "Adds 5 points to your score", white)
+        helpDisplay.blit(minus, (x, y*11-4))
+        message(x*2, y*11, "Takes off 5 points from your score", white)
+        
         
         pygame.display.update()
     
@@ -262,14 +263,14 @@ def gameLoop(level, mode):
     plus_x = randrange(0,display_width - plus_width)
     plus_y = 0 - plus_width - randint(500,5000)
     plus_immunity_time = time.time()
-    faster_speed= False
+    plus_appearance = False
 
     minus_frequency = randint(10,20)
     minus_time=time.time() #minus start time
     minus_x = randrange(0,display_width - minus_width)
     minus_y = 0 - minus_width - randint(500,5000)
     minus_immunity_time = time.time()
-    slower_speed= False
+    minus_appearance = False
     
     #variable for how long immunity lasts
     ghost_frequency = randint(10,20)
@@ -283,15 +284,15 @@ def gameLoop(level, mode):
     angry_time=time.time() 
     angry_x = randrange(0,display_width - angry_width)
     angry_y = 0 - angry_width - randint(500,5000)
-    angry_appearance_time = time.time()
-    angry_appearance = False
+    angry_immunity_time = time.time()
+    faster_speed= False
     
     gift_frequency = randint(10,20)
     gift_time=time.time() 
     gift_x = randrange(0,display_width - gift_width)
     gift_y = 0 - gift_width - randint(500,5000)
-    gift_appearance_time = time.time()
-    gift_appearance = False
+    gift_immunity_time = time.time()
+    slower_speed= False
     
     bonus_visibility=False
     bonus_max_time=5
@@ -329,6 +330,7 @@ def gameLoop(level, mode):
                                 gameLoop(level, mode)
                             elif level == 'ultra-hard':
                                 message_center('You already played the hardest level!', white, 150)
+                    
                         
                         
                         
@@ -341,6 +343,13 @@ def gameLoop(level, mode):
                     lead_x_change = -size_x/2
                 if event.key == pygame.K_RIGHT:
                     lead_x_change = size_x/2
+                
+                #if event.key == pygame.K_SPACE:
+##                    print('aa')
+##                    while True:
+##                        n = input('')
+##                        if n==' ':
+##                            break
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT :
                     lead_x_change = 0
@@ -410,62 +419,62 @@ def gameLoop(level, mode):
                     lead_y+size_y<i[1]+i[3]:
                         gameOver=True
         
-        #-------------------plus-------------------------
-        #plus appears after random amount of time
-        if time.time() - plus_time > plus_frequency:
-            if plus_y < 0 and plus_y > display_height: # checks whether plus is on the screen already or not
-                plus_frequency = randint(10,20)
-                plus_time=time.time()
-                plus_x = randrange(0,display_width - plus_width)
-                plus_y = 0 - plus_width
+        #-------------------angry-------------------------
+        #angry appears after random amount of time
+        if time.time() - angry_time > angry_frequency:
+            if angry_y < 0 or angry_y > display_height: # checks whether angry is on the screen already or not
+                angry_frequency = randint(10,20)
+                angry_time=time.time()
+                angry_x = randrange(0,display_width - angry_width)
+                angry_y = 0 - angry_width
                 
-        gameDisplay.blit(plus, (plus_x,plus_y))
-        plus_y += 10
+        gameDisplay.blit(angry, (angry_x,angry_y))
+        angry_y += 10
         
-        #Plus collision makes everything faster
-        if lead_x>plus_x and lead_x<plus_x+plus_width or lead_x+size_x>plus_x and \
-        lead_x+size_x<plus_x+plus_width or lead_x<plus_x and lead_x+size_x>plus_x+plus_width:
-                if lead_y>plus_y and lead_y<plus_y+plus_height or lead_y+size_y>plus_y and \
-                lead_y+size_y<plus_y+plus_height:
-                    plus_immunity_time = time.time()
+        #angry collision makes everything faster
+        if lead_x>angry_x and lead_x<angry_x+angry_width or lead_x+size_x>angry_x and \
+        lead_x+size_x<angry_x+angry_width or lead_x<angry_x and lead_x+size_x>angry_x+angry_width:
+                if lead_y>angry_y and lead_y<angry_y+angry_height or lead_y+size_y>angry_y and \
+                lead_y+size_y<angry_y+angry_height:
+                    angry_immunity_time = time.time()
                     faster_speed = True
-                    plus_y = display_height
+                    angry_y = display_height
                     bonus_visibility=True
                     bonus_list['Speed ++ ']=time.time()     
         
         if faster_speed == True:  
-            if time.time() - plus_immunity_time > 5:
+            if time.time() - angry_immunity_time > 5:
                 faster_speed = False
                 del bonus_list['Speed ++ ']
                 #Check if bonus_list dict is empty
                 if not bonus_list:
                     bonus_visibility= False
         
-        #-------------------minus-------------------------       
-        #minus appears after random amount of time
-        if time.time() - minus_time > minus_frequency:
-            if minus_y < 0 and minus_y > display_height: # checks whether minus is on the screen already or not
-                minus_frequency = randint(10,20)
-                minus_time=time.time()
-                minus_x = randrange(0,display_width - minus_width)
-                minus_y = 0 - minus_width
+        #-------------------gift-------------------------       
+        #gift appears after random amount of time
+        if time.time() - gift_time > gift_frequency:
+            if gift_y < 0 or gift_y > display_height: # checks whether gift is on the screen already or not
+                gift_frequency = randint(10,20)
+                gift_time=time.time()
+                gift_x = randrange(0,display_width - gift_width)
+                gift_y = 0 - gift_width
                 
-        gameDisplay.blit(minus, (minus_x,minus_y))
-        minus_y += 10
+        gameDisplay.blit(gift, (gift_x,gift_y))
+        gift_y += 10
         
-        #minus collision makes everything slower
-        if lead_x>minus_x and lead_x<minus_x+minus_width or lead_x+size_x>minus_x and \
-        lead_x+size_x<minus_x+minus_width or lead_x<minus_x and lead_x+size_x>minus_x+minus_width:
-                if lead_y>minus_y and lead_y<minus_y+minus_height or lead_y+size_y>minus_y and \
-                lead_y+size_y<minus_y+minus_height:
-                    minus_immunity_time = time.time()
+        #gift collision makes everything slower
+        if lead_x>gift_x and lead_x<gift_x+gift_width or lead_x+size_x>gift_x and \
+        lead_x+size_x<gift_x+gift_width or lead_x<gift_x and lead_x+size_x>gift_x+gift_width:
+                if lead_y>gift_y and lead_y<gift_y+gift_height or lead_y+size_y>gift_y and \
+                lead_y+size_y<gift_y+gift_height:
+                    gift_immunity_time = time.time()
                     slower_speed = True
-                    minus_y = display_height
+                    gift_y = display_height
                     bonus_visibility=True
                     bonus_list['Speed -- ']=time.time()
                     
         if slower_speed == True:  
-            if time.time() - minus_immunity_time > 5:
+            if time.time() - gift_immunity_time > 5:
                 slower_speed = False
                 del bonus_list['Speed -- ']
                 if not bonus_list:
@@ -474,7 +483,7 @@ def gameLoop(level, mode):
         #-------------------ghost-------------------------
         #ghost appears and offers immunity
         if time.time() - ghost_time > ghost_frequency:
-            if ghost_y < 0 and ghost_y > display_height: # checks whether ghost is on the screen already or not
+            if ghost_y < 0 or ghost_y > display_height: # checks whether ghost is on the screen already or not
                 ghost_frequency = randint(10,20)
                 ghost_time=time.time()
                 ghost_x = randrange(0,display_width - ghost_width)
@@ -508,62 +517,62 @@ def gameLoop(level, mode):
         #If chosen mode is 'score', show two more bonuses    
         if mode == 'score':
             
-            #-------------------angryface-------------------------
-            if time.time() - angry_time > angry_frequency:
-                if angry_y < 0 and angry_y > display_height: # checks whether angry is on the screen already or not
-                    angry_frequency = randint(10,20)
-                    angry_time=time.time()
-                    angry_x = randrange(0,display_width - angry_width)
-                    angry_y = 0 - angry_width
+            #-------------------minus-------------------------
+            if time.time() - minus_time > minus_frequency:
+                if minus_y < 0 or minus_y > display_height: # checks whether minus is on the screen already or not
+                    minus_frequency = randint(10,20)
+                    minus_time=time.time()
+                    minus_x = randrange(0,display_width - minus_width)
+                    minus_y = 0 - minus_width
                 
-            gameDisplay.blit(angry, (angry_x, angry_y))
-            angry_y += 10
+            gameDisplay.blit(minus, (minus_x, minus_y))
+            minus_y += 10
             
-            #Colliding with angry face decreases score points
-            if lead_x>angry_x and lead_x<angry_x+angry_width or lead_x+size_x>angry_x and \
-            lead_x+size_x<angry_x+angry_width or lead_x<angry_x and lead_x+size_x>angry_x+angry_width:
-                if lead_y>angry_y and lead_y<angry_y+angry_height or lead_y+size_y>angry_y and \
-                lead_y+size_y<angry_y+angry_height:
-                    angry_appearance = True
-                    angry_appearance_time = time.time()
-                    angry_y = display_height
+            #Colliding with minus face decreases score points
+            if lead_x>minus_x and lead_x<minus_x+minus_width or lead_x+size_x>minus_x and \
+            lead_x+size_x<minus_x+minus_width or lead_x<minus_x and lead_x+size_x>minus_x+minus_width:
+                if lead_y>minus_y and lead_y<minus_y+minus_height or lead_y+size_y>minus_y and \
+                lead_y+size_y<minus_y+minus_height:
+                    minus_appearance = True
+                    minus_immunity_time = time.time()
+                    minus_y = display_height
                     block_count = block_count-5
                     bonus_list['Score: -'] = 5
                     bonus_visibility = True
             
-            if angry_appearance == True:
-                if time.time() - angry_appearance_time > 3:
-                    angry_appearance = False
+            if minus_appearance == True:
+                if time.time() - minus_immunity_time > 3:
+                    minus_appearance = False
                     del bonus_list['Score: -']
                     if not bonus_list:
                         bonus_visibility=False
                     
-            #-------------------gift-------------------------   
-            if time.time() - gift_time > gift_frequency:
-                if gift_y < 0 and gift_y > display_height: # checks whether gift is on the screen already or not
-                    gift_frequency = randint(10,20)
-                    gift_time=time.time()
-                    gift_x = randrange(0,display_width - gift_width)
-                    gift_y = 0 - gift_width
+            #-------------------plus-------------------------   
+            if time.time() - plus_time > plus_frequency:
+                if plus_y < 0 or plus_y > display_height: # checks whether plus is on the screen already or not
+                    plus_frequency = randint(10,20)
+                    plus_time=time.time()
+                    plus_x = randrange(0,display_width - plus_width)
+                    plus_y = 0 - plus_width
                 
-            gameDisplay.blit(gift, (gift_x, gift_y))
-            gift_y += 10
+            gameDisplay.blit(plus, (plus_x, plus_y))
+            plus_y += 10
         
-            #Gift increases score by 5 points
-            if lead_x > gift_x and lead_x < gift_x + gift_width or lead_x+size_x > gift_x and \
-            lead_x+size_x < gift_x+gift_width or lead_x < gift_x and lead_x+size_x > gift_x+gift_width:
-                if lead_y>gift_y and lead_y<gift_y+gift_height or lead_y+size_y>gift_y and \
-                lead_y+size_y<gift_y+gift_height:
-                    gift_appearance = True
-                    gift_appearance_time = time.time()
-                    gift_y = display_height
+            #plus increases score by 5 points
+            if lead_x > plus_x and lead_x < plus_x + plus_width or lead_x+size_x > plus_x and \
+            lead_x+size_x < plus_x+plus_width or lead_x < plus_x and lead_x+size_x > plus_x+plus_width:
+                if lead_y>plus_y and lead_y<plus_y+plus_height or lead_y+size_y>plus_y and \
+                lead_y+size_y<plus_y+plus_height:
+                    plus_appearance = True
+                    plus_immunity_time = time.time()
+                    plus_y = display_height
                     block_count = block_count+5
                     bonus_list['Score: +'] = 5
                     bonus_visibility = True
                     
-            if gift_appearance == True:
-                if time.time() - gift_appearance_time > 3:
-                    gift_appearance = False
+            if plus_appearance == True:
+                if time.time() - plus_immunity_time > 3:
+                    plus_appearance = False
                     del bonus_list['Score: +']
                     if not bonus_list:
                         bonus_visibility=False
