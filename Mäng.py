@@ -13,8 +13,6 @@ black = (0, 0, 0)
 grey = (220, 220, 220)
 darkgrey = (119,136,153)
 
-FPS = 30
-
 display_width = 800
 display_height = 600
 
@@ -40,6 +38,7 @@ ghost, ghost_width, ghost_height = picture_resize("ghost.png", 7)
 pygame.display.set_caption('Mäng')
 
 clock = pygame.time.Clock()
+FPS = 30
 
 font = pygame.font.SysFont(None, 40)
 
@@ -106,13 +105,15 @@ def gameIntro():
     button_x = 140
     button_y = 50
     
-    button_loc_y = display_height/2+200
+    loc_y = display_height/2+200
     mediumButton_x = display_width/2-button_x/2
     easyButton_x = mediumButton_x-200
     hardButton_x = mediumButton_x+200
     
     help_x = display_width-200
     help_y = display_height-550
+    quit_x = 200 - button_x
+    quit_y = help_y
     
     timeMode_x = display_width/2 -200
     scoreMode_x = display_width/2 + 50
@@ -131,7 +132,7 @@ def gameIntro():
                 mouse_y = pygame.mouse.get_pos()[1]
                 
                 #when one of the mode buttons is clicked, it changes color + mode is chosen
-                if (timeMode_x < mouse_x < timeMode_x+button_x) and (modeButton_y < mouse_y < modeButton_y + button_y):
+                if (timeMode_x < mouse_x < timeMode_x+button_x) and  (modeButton_y < mouse_y < modeButton_y + button_y):
                     timecolor = darkgrey
                     scorecolor = grey
                     mode = 'time'
@@ -142,13 +143,13 @@ def gameIntro():
                     mode = 'score'
                     
                 #Choose which level you want to play     
-                if (easyButton_x < mouse_x < easyButton_x + button_x) and (button_loc_y < mouse_y < button_loc_y + button_y):
+                if (easyButton_x < mouse_x < easyButton_x + button_x) and (loc_y < mouse_y < loc_y + button_y):
                     level = 'easy'
                     intro = False
-                if (mediumButton_x < mouse_x < mediumButton_x + button_x) and (button_loc_y < mouse_y < button_loc_y + button_y):
+                if (mediumButton_x < mouse_x < mediumButton_x + button_x) and (loc_y < mouse_y < loc_y + button_y):
                     level = 'medium'
                     intro = False
-                if (hardButton_x < mouse_x < hardButton_x + button_x) and (button_loc_y < mouse_y < button_loc_y + button_y):
+                if (hardButton_x < mouse_x < hardButton_x + button_x) and (loc_y < mouse_y < loc_y + button_y):
                     level = 'hard'
                     intro = False
                        
@@ -156,6 +157,9 @@ def gameIntro():
                 if (help_x < mouse_x < help_x + button_x) and (help_y < mouse_y < help_y + button_y):
                     helpScreen()
                     intro = False
+                    
+                if (quit_x < mouse_x < quit_x + button_x) and (quit_y < mouse_y < quit_y + button_y):
+                    pygame.quit()
                     
         gameDisplay.blit(bg, (0,0))
 
@@ -167,11 +171,12 @@ def gameIntro():
         
         message_center("Choose your level", white, +150)
         
-        button("Easy", grey, easyButton_x, button_loc_y, button_x, button_y)
-        button("Medium", grey, mediumButton_x, button_loc_y, button_x, button_y)
-        button("Hard", grey, hardButton_x, button_loc_y, button_x, button_y)
+        button("Easy", grey, easyButton_x, loc_y, button_x, button_y)
+        button("Medium", grey, mediumButton_x, loc_y, button_x, button_y)
+        button("Hard", grey, hardButton_x, loc_y, button_x, button_y)
         
         button("Help", grey, help_x, help_y, button_x, button_y)
+        button("Quit", grey, quit_x, quit_y, button_x, button_y)
         
         pygame.display.update()
         clock.tick(FPS)
@@ -238,6 +243,7 @@ def helpScreen():
 def gameLoop(level, mode):
     gameExit = False
     gameOver = False
+    won = False
 
     lead_x = display_width/2
     lead_y = display_height-50
@@ -245,6 +251,7 @@ def gameLoop(level, mode):
     
     start_time=time.time()
     state='Game Over'
+    start=time.time()
     blocks=[]
     block_count = 0
     
@@ -292,7 +299,9 @@ def gameLoop(level, mode):
 
     while not gameExit:
         while gameOver:
-            message_center(state+', press C to play again or Q to quit', white)
+            message_center(state+', press C to play again or Q to go back', white)
+            if won == True:
+                message_center('Press L to go to next level', white, 100)
             pygame.display.update()
             
             for event in pygame.event.get():
@@ -301,10 +310,24 @@ def gameLoop(level, mode):
                     gameOver = False
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_q:
-                        gameExit = True
-                        gameOver = False
+                        gameIntro()
                     if event.key == pygame.K_c:
-                        gameLoop(level, mode)       
+                        gameLoop(level, mode)
+                    if event.key == pygame.K_l:
+                        if won == True: 
+                            if level == 'easy':
+                                level = 'medium'
+                                won = False
+                                gameLoop(level, mode)
+                            elif level == 'medium':
+                                level = 'hard'
+                                won = False
+                                gameLoop(level, mode)
+                            elif level == 'hard':
+                                message_center('You already played the hardest level!', white, 150)
+                        
+                        
+                        
             
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -541,9 +564,10 @@ def gameLoop(level, mode):
             state='Your score: '+str(score)
         elif mode == 'time':
             score=show_time(start)
-            if score>30:
+            if score>10:
                 state='You won'
                 gameOver=True
+                won = True
         
         pygame.display.update()
         clock.tick(FPS)
