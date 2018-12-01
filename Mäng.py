@@ -253,30 +253,33 @@ def helpScreen():
         clock.tick(FPS)
     
     gameIntro()
-    
+
+#big function for main game
 def gameLoop(level, mode):
     gameExit = False
     gameOver = False
     won = False
 
-    lead_x = display_width/2
-    lead_y = display_height-50
-    lead_x_change = 0
+    lead_x = display_width/2 #x coordinate for player
+    lead_y = display_height-50 #y coordinate for player
+    lead_x_change = 0 #x change for player
     
-    start_time=time.time()
-    state='Game Over'
-    start=time.time()
-    blocks=[]
-    block_count = 0
+    start_time=time.time() #saving start time when level is chosen for fireballs
+    state='Game Over' #shows on screen when player looses, wins or just shows score
+    start=time.time() #saving start time for showing time in time mode
+    blocks=[] #list for saving all fireballs that has to be drawn
+    block_count = 0 #number for showing score in score mode
     
-    fireball, fireball_width, fireball_height = picture_resize("fireball.png", 1)
+    fireball, fireball_width, fireball_height = picture_resize("fireball.png", 1) #getting variable from function for fireball
 
-    plus_frequency = randint(10,20)
-    plus_time=time.time() #plus start time
-    plus_x = randrange(0,display_width - plus_width)
-    plus_y = 0 - plus_width - randint(500,5000)
-    plus_immunity_time = 0
-    plus_appearance = False
+    plus_frequency = randint(10,20) #how frequent plus shows on screen
+    plus_time=time.time() #time for checking how many sec have passed after plus has been displayed
+    plus_x = randrange(0,display_width - plus_width) #x coordinate for plus, displays randomly across display width
+    plus_y = 0 - plus_width - randint(500,5000) #y coordinate for plus, randint for making it appear different times
+    plus_immunity_time = 0 #time for checking how long the text shows (for others as well how long the ability lasts)
+    plus_appearance = False #checks whether player caught the bonus, if yes then displays the text and activates the bonus
+    
+    #are we going to make that function for variable? it depends how much comments I have to write
 
     minus_frequency = randint(10,20)
     minus_time=time.time() #minus start time
@@ -285,7 +288,6 @@ def gameLoop(level, mode):
     minus_immunity_time = 0
     minus_appearance = False
     
-    #variable for how long immunity lasts
     ghost_frequency = randint(10,20)
     ghost_time=time.time() #ghost start time
     ghost_x = randrange(0,display_width - ghost_width)
@@ -307,28 +309,28 @@ def gameLoop(level, mode):
     gift_immunity_time = 0
     slower_speed= False
     
-    bonus_visibility=False
-    bonus_max_time=5
-    bonus_list={}
-
-    while not gameExit:
-        while gameOver:
-            message_center(state+', press C to play again or Q to go back', white)
-            if won == True:
+    bonus_visibility=False #if player caches bonus, it shows the text above
+    bonus_max_time=5 #how long bonuses last
+    bonus_list={} #list for showing all cached bonuses on screen
+    
+    while not gameExit: #big game loop, it stops when player quits game
+        while gameOver: #activates when player loses
+            message_center(state+', press C to play again or Q to go back', white) #shows when player loses
+            if won == True: #if win then it is possible to go to next level
                 message_center('Press L to go to next level', white, 100)
-            pygame.display.update()
+            pygame.display.update() #updating display every frame
             
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
+            for event in pygame.event.get(): #getting events when player has lost
+                if event.type == pygame.QUIT: #pushed X button in right corner
                     gameExit = True
                     gameOver = False
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_q:
+                if event.type == pygame.KEYDOWN: #if player pushed some key
+                    if event.key == pygame.K_q: #if q then goes to intro screen
                         gameIntro()
-                    if event.key == pygame.K_c:
+                    if event.key == pygame.K_c: #if c then starts the game again
                         gameLoop(level, mode)
-                    if event.key == pygame.K_l:
-                        if won == True: 
+                    if event.key == pygame.K_l: #if l then goes to nect level
+                        if won == True: #checks whether player won
                             if level == 'easy':
                                 level = 'medium'
                                 won = False
@@ -341,20 +343,17 @@ def gameLoop(level, mode):
                                 level = 'ultra-hard'
                                 won = False
                                 gameLoop(level, mode)
-                            elif level == 'ultra-hard':
-                                message_center('You already played the hardest level!', white, 150)
-                    
-                        
-                        
+                            elif level == 'ultra-hard': #secret ultra-hard level
+                                message_center('You already played the hardest level!', white, 150)          
                         
             
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+        for event in pygame.event.get(): #getting events in main game
+            if event.type == pygame.QUIT: #if quit button
                 gameExit = True
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
+            if event.type == pygame.KEYDOWN: #if pressed key
+                if event.key == pygame.K_LEFT: #if left arrow key then player goes left
                     lead_x_change = -size_x/2
-                if event.key == pygame.K_RIGHT:
+                if event.key == pygame.K_RIGHT: #if right arrow key then player goes right
                     lead_x_change = size_x/2
                 
                 #if event.key == pygame.K_SPACE:
@@ -363,36 +362,33 @@ def gameLoop(level, mode):
 ##                        n = input('')
 ##                        if n==' ':
 ##                            break
-            if event.type == pygame.KEYUP:
+            if event.type == pygame.KEYUP: #if key up then player does not move anymore
                 if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT :
                     lead_x_change = 0
             
-            #Add player movement with mouse/touchpad
-            if event.type == pygame.MOUSEMOTION:
+            if event.type == pygame.MOUSEMOTION: #player movement with mouse/touchpad
                 lead_x = event.pos[0]-(size_x/2) #cursor in the middle of spaceship
         
-        lead_x += lead_x_change
+        lead_x += lead_x_change #moving player
 
+        # 4 if statements for drawing fireballs for each level
         if level=='easy':
-            #A new fireball appears after every n seconds
+            #A new fireball appears after every 2 seconds
             if time.time() -start_time > 2:
                 start_time=time.time()
-                drawing_by_level(blocks, fireball_width,fireball_height, 5, 20)
-            
+                drawing_by_level(blocks, fireball_width,fireball_height, 5, 20) # 5 and 20 are interval how quickly fireballs will come ?????????
         elif level=='medium':
             #A new fireball appears after every 1 second
             if time.time() -start_time > 1:
                 start_time=time.time()
                 drawing_by_level(blocks, fireball_width,fireball_height, 10, 30)
-               
         elif level=='hard':
-            #A new fireball appears after every two seconds
+            #A new fireball appears after every 0.5 seconds
             if time.time() -start_time > 0.5:
                 start_time=time.time()
                 drawing_by_level(blocks, fireball_width,fireball_height, 15, 40)
-                
         elif level=='ultra-hard':
-            #A new fireball appears after every two seconds
+            #A new fireball appears after every 0.3 seconds
             if time.time() -start_time > 0.3:
                 start_time=time.time()
                 drawing_by_level(blocks, fireball_width,fireball_height, 30, 50)
@@ -405,8 +401,8 @@ def gameLoop(level, mode):
             lead_x = 0
             lead_x_change = 0
 
-        gameDisplay.blit(bg, (0,0))
-        gameDisplay.blit(player, [lead_x,lead_y])
+        gameDisplay.blit(bg, (0,0)) #drawing the backgroung every frame
+        gameDisplay.blit(player, [lead_x,lead_y]) #drawing the player every frame
         
         #drawing every figure in blocks list (fireball info)
         for i in blocks:
@@ -417,15 +413,15 @@ def gameLoop(level, mode):
             elif slower_speed==True and faster_speed==False:
                 i[1]=i[1]+i[4]/2        
                 
-            fireball_icon = pygame.transform.scale(fireball, (i[2], i[3]))
-            gameDisplay.blit(fireball_icon, [i[0], i[1]])
+            fireball_icon = pygame.transform.scale(fireball, (i[2], i[3])) #transforming to a right size
+            gameDisplay.blit(fireball_icon, [i[0], i[1]]) #drawing the fireball
             
-            if i[1]>display_height:
-                blocks.remove(i)
-                block_count+=1
+            if i[1]>display_height: #if fireball goes out of screen 
+                blocks.remove(i) #it gets removed from list that has to be drawn on screen
+                block_count+=1 #for score mode it count how many fireballs player has passed
                
-            #collision
-            if ghost_immunity == False:
+            #collision with ghost
+            if ghost_immunity == False: #if there is no immunity then it checks whether the player has collided with a any fireball
                 if lead_x>i[0] and lead_x<i[0]+i[2] or lead_x+size_x>i[0] and \
                 lead_x+size_x<i[0]+i[2] or lead_x<i[0] and lead_x+size_x>i[0]+i[2]:
                     if lead_y>i[1] and lead_y<i[1]+i[3] or lead_y+size_y>i[1] and \
@@ -434,33 +430,32 @@ def gameLoop(level, mode):
         
         #-------------------angry-------------------------
         #angry appears after random amount of time
-        if time.time() - angry_time > angry_frequency:
+        if time.time() - angry_time > angry_frequency: #if the random time (from frequency) has passed, it gets new variables for another angry bonus
             if angry_y < 0 or angry_y > display_height: # checks whether angry is on the screen already or not
-                angry_frequency = randint(10,20)
-                angry_time=time.time()
-                angry_x = randrange(0,display_width - angry_width)
-                angry_y = 0 - angry_width
+                angry_frequency = randint(10,20) #getting new frequency variable so that it does not appear at the same time all game
+                angry_time=time.time() #getting new angry start time
+                angry_x = randrange(0,display_width - angry_width) #new x coordinate
+                angry_y = 0 - angry_width #set y coordinate to screen's top
                 
-        gameDisplay.blit(angry, (angry_x,angry_y))
-        angry_y += 10
+        gameDisplay.blit(angry, (angry_x,angry_y)) #draws angry bonus
+        angry_y += 10 #moves it always by 10
         
         #angry collision makes everything faster
         if lead_x>angry_x and lead_x<angry_x+angry_width or lead_x+size_x>angry_x and \
         lead_x+size_x<angry_x+angry_width or lead_x<angry_x and lead_x+size_x>angry_x+angry_width:
                 if lead_y>angry_y and lead_y<angry_y+angry_height or lead_y+size_y>angry_y and \
                 lead_y+size_y<angry_y+angry_height:
-                    angry_immunity_time = time.time()
-                    faster_speed = True
-                    angry_y = display_height
-                    bonus_visibility=True
-                    bonus_list['Speed ++ ']=time.time()     
+                    angry_immunity_time = time.time() #sets new start time for bonus
+                    faster_speed = True 
+                    angry_y = display_height #puts angry at the screen bottom
+                    bonus_visibility=True #shows bonus
+                    bonus_list['Speed ++ ']=time.time() #adds to a dictionary for it to be displayed    
         
-        if faster_speed == True:  
-            if time.time() - angry_immunity_time > 5:
+        if faster_speed == True: #if there has been collision with angry bonus
+            if time.time() - angry_immunity_time > 5: #checks whether 5 sec has passed
                 faster_speed = False
-                del bonus_list['Speed ++ ']
-                #Check if bonus_list dict is empty
-                if not bonus_list:
+                del bonus_list['Speed ++ '] #deletes it from dictionary and it does not show anymore
+                if not bonus_list: #Check if bonus_list dict is empty
                     bonus_visibility= False
         
         #-------------------gift-------------------------       
@@ -527,9 +522,7 @@ def gameLoop(level, mode):
         if bonus_visibility==True:
             show_bonus(bonus_list, bonus_max_time)
                
-        #If chosen mode is 'score', show two more bonuses    
-        if mode == 'score':
-            
+        if mode == 'score': #If chosen mode is 'score', show two more bonuses 
             #-------------------minus-------------------------
             if time.time() - minus_time > minus_frequency:
                 if minus_y < 0 or minus_y > display_height: # checks whether minus is on the screen already or not
@@ -601,9 +594,9 @@ def gameLoop(level, mode):
                 gameOver=True
                 won = True
         
-        pygame.display.update()
-        clock.tick(FPS)
+        pygame.display.update() #updates the display
+        clock.tick(FPS) #sets how often the frames are refreshed
             
-    pygame.quit()
+    pygame.quit() #if gets out of gameExit loop the it quits the game
 
 gameIntro()
