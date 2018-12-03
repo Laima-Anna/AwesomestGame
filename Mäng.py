@@ -16,6 +16,9 @@ darkgrey = (119,136,153)
 display_width = 800
 display_height = 600
 
+button_x = 140 #general button width
+button_y = 50 #general button height
+
 bg = pygame.image.load("space.jpg") #background picture
 gameDisplay = pygame.display.set_mode((display_width,display_height))
 helpDisplay = pygame.display.set_mode((display_width,display_height))
@@ -102,6 +105,16 @@ def button(text, color, x, y, width, height):
     pygame.draw.rect(gameDisplay, color, (x, y, width, height))
     message_center(text, black, 0, x+width/2, y+height/2)
     
+#function for defining bonus variables    
+def bonus_variables(width):
+    frequency = randint(10,20) #how frequently bonus shows on screen
+    time1 = time.time() #time for measuring how many sec have passed after bonus is displayed, compares with frequency
+    x = randrange(0,display_width - width) #x coordinate for bonus, displays randomly across display width
+    y = 0 - width - randint(500,5000) #y coordinate for plus, randint for making it appear different times
+    immunity_time = 0 #time for checking how long the text shows
+    immunity = False #checks whether player caught the bonus, if yes then displays the text and activates the bonus
+    return frequency, time1, x, y, immunity_time, immunity
+    
 #Start screen
 def gameIntro():
     intro = True
@@ -109,20 +122,18 @@ def gameIntro():
     mode = 'time' #chosen by default
     
     #different variables for different buttons
-    button_x = 140
-    button_y = 50
+    loc_y = display_height/2+200 #y-coordinate for some buttons (easy, medium, hard)
+    mediumButton_x = display_width/2-button_x/2 #x-coordinate for medium level
+    easyButton_x = mediumButton_x-200 #x-coordinate for easy level
+    hardButton_x = mediumButton_x+200 #x-coordinate for hard level
     
-    loc_y = display_height/2+200
-    mediumButton_x = display_width/2-button_x/2
-    easyButton_x = mediumButton_x-200
-    hardButton_x = mediumButton_x+200
+    help_x = display_width-button_x-50 #x-coordinate for help button
+    help_y = display_height-550 #y-coordinate for help button
+    quit_x = display_width-750 #x-coordinate for quit button
+    quit_y = display_height-550 #y-coordinate for quit button
     
-    help_x = display_width-button_x-50
-    help_y = display_height-550
-    quit_x = display_width-750
-    quit_y = display_height-550
-    
-    timeMode_x = display_width/2 -200
+    #x and y coordinates for mode buttons
+    timeMode_x = display_width/2 -200 
     scoreMode_x = display_width/2 + 50
     modeButton_y = display_height/2
     
@@ -132,15 +143,15 @@ def gameIntro():
     
     while intro:
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+            if event.type == pygame.QUIT: #quit window when exit button is clicked
                 pygame.quit()
                 
-            
-            if event.type == pygame.KEYDOWN:
+            if event.type == pygame.KEYDOWN: #quit window when Q is pressed
                 if event.key == pygame.K_q:
                     pygame.quit()
                     
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            #get mouse coordinates when mouse is clicked
+            if event.type == pygame.MOUSEBUTTONDOWN: 
                 mouse_x = pygame.mouse.get_pos()[0]
                 mouse_y = pygame.mouse.get_pos()[1]
                 
@@ -166,16 +177,17 @@ def gameIntro():
                     level = 'hard'
                     intro = False
                        
-                #What happens when you click Help button
+                #when you click Help button, we go to help screen page
                 if (help_x < mouse_x < help_x + button_x) and (help_y < mouse_y < help_y + button_y):
                     helpScreen()
-                    intro = False
-                    
+                
+                #when you click Quit button, we quit the window
                 if (quit_x < mouse_x < quit_x + button_x) and (quit_y < mouse_y < quit_y + button_y):
                     pygame.quit()
                     
         gameDisplay.blit(bg, (0,0))
 
+        #generate messages and buttons
         message_center("The aim of the game is to avoid fireballs", white, -100)
         message_center("Choose your game mode", white, -50)
 
@@ -193,18 +205,18 @@ def gameIntro():
         
         pygame.display.update()
         clock.tick(FPS)
-        
-    #return level, mode
+    
+    #when we choose a level, while cycle ends and we call this function to start playing
     gameLoop(level, mode)
 
 def helpScreen():
     exit = False
     
+    #variables for x and y coordinates to display messages and buttons on screen
     x = 50
     y = 50
     
-    button_x = 140
-    button_y = 50
+    #x and y coordinates for quit button
     go_back_x = display_width - 750
     go_back_y = display_height - 550
     
@@ -217,6 +229,7 @@ def helpScreen():
                 mouse_x = pygame.mouse.get_pos()[0]
                 mouse_y = pygame.mouse.get_pos()[1]
                 
+                #if Go back button is clicked, we exit helpScreen and go back to Intro screen
                 if (go_back_x < mouse_x < go_back_x + button_x) and \
                 (go_back_y < mouse_y < go_back_y + button_y):
                     exit = True
@@ -247,11 +260,11 @@ def helpScreen():
         helpDisplay.blit(minus, (x, y*11-4))
         message(x*2, y*11, "Takes off 5 points from your score", white)
         
-        
         pygame.display.update()
     
         clock.tick(FPS)
     
+    #when while cycle ends, we quit helpScreen and go back to intro screen
     gameIntro()
 
 #big function for main game
@@ -271,43 +284,12 @@ def gameLoop(level, mode):
     block_count = 0 #number for showing score in score mode
     
     fireball, fireball_width, fireball_height = picture_resize("fireball.png", 1) #getting variable from function for fireball
-
-    plus_frequency = randint(10,20) #how frequent plus shows on screen
-    plus_time=time.time() #time for checking how many sec have passed after plus has been displayed
-    plus_x = randrange(0,display_width - plus_width) #x coordinate for plus, displays randomly across display width
-    plus_y = 0 - plus_width - randint(500,5000) #y coordinate for plus, randint for making it appear different times
-    plus_immunity_time = 0 #time for checking how long the text shows (for others as well how long the ability lasts)
-    plus_appearance = False #checks whether player caught the bonus, if yes then displays the text and activates the bonus
     
-    #are we going to make that function for variable? it depends how much comments I have to write
-
-    minus_frequency = randint(10,20)
-    minus_time=time.time() #minus start time
-    minus_x = randrange(0,display_width - minus_width)
-    minus_y = 0 - minus_width - randint(500,5000)
-    minus_immunity_time = 0
-    minus_appearance = False
-    
-    ghost_frequency = randint(10,20)
-    ghost_time=time.time() #ghost start time
-    ghost_x = randrange(0,display_width - ghost_width)
-    ghost_y = 0 - ghost_width - randint(500,5000)
-    ghost_immunity_time = 0
-    ghost_immunity = False
-    
-    angry_frequency = randint(10,20)
-    angry_time=time.time() 
-    angry_x = randrange(0,display_width - angry_width)
-    angry_y = 0 - angry_width - randint(500,5000)
-    angry_immunity_time = 0
-    faster_speed= False
-    
-    gift_frequency = randint(10,20)
-    gift_time=time.time() 
-    gift_x = randrange(0,display_width - gift_width)
-    gift_y = 0 - gift_width - randint(500,5000)
-    gift_immunity_time = 0
-    slower_speed= False
+    ghost_frequency, ghost_time, ghost_x, ghost_y, ghost_immunity_time, ghost_immunity = bonus_variables(ghost_width)
+    plus_frequency, plus_time, plus_x, plus_y, plus_immunity_time, plus_appearance = bonus_variables(plus_width)
+    minus_frequency, minus_time, minus_x, minus_y, minus_immunity_time, minus_appearance = bonus_variables(minus_width)
+    angry_frequency, angry_time, angry_x, angry_y, angry_immunity_time, faster_speed = bonus_variables(angry_width)
+    gift_frequency, gift_time, gift_x, gift_y, gift_immunity_time, slower_speed = bonus_variables(gift_width)
     
     bonus_visibility=False #if player caches bonus, it shows the text above
     bonus_max_time=5 #how long bonuses last
@@ -369,12 +351,6 @@ def gameLoop(level, mode):
                 if event.key == pygame.K_RIGHT: #if right arrow key then player goes right
                     lead_x_change = size_x/2
                 
-                #if event.key == pygame.K_SPACE:
-##                    print('aa')
-##                    while True:
-##                        n = input('')
-##                        if n==' ':
-##                            break
             if event.type == pygame.KEYUP: #if key up then player does not move anymore
                 if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT :
                     lead_x_change = 0
