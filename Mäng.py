@@ -344,7 +344,20 @@ def gameLoop(level, mode):
                                 won = False
                                 gameLoop(level, mode)
                             elif level == 'ultra-hard': #secret ultra-hard level
-                                message_center('You already played the hardest level!', white, 150)          
+                                level = 'super-hard'
+                                won = False
+                                gameLoop(level, mode)
+                            elif level == 'super-hard': #secret super-hard level
+                                level = 'hyper-hard'
+                                won = False
+                                gameLoop(level, mode)
+                            elif level == 'hyper-hard': #secret hyper-hard level
+                                level = 'mega-hard'
+                                won = False
+                                gameLoop(level, mode)
+                            elif level == 'mega-hard': #secret mega-hard level
+                                message_center('You already played the hardest level!', white, 150)
+                            
                         
             
         for event in pygame.event.get(): #getting events in main game
@@ -389,9 +402,24 @@ def gameLoop(level, mode):
                 drawing_by_level(blocks, fireball_width,fireball_height, 15, 40)
         elif level=='ultra-hard':
             #A new fireball appears after every 0.3 seconds
+            if time.time() -start_time > 0.4:
+                start_time=time.time()
+                drawing_by_level(blocks, fireball_width,fireball_height, 20, 45)
+        elif level=='super-hard':
+            #A new fireball appears after every 0.3 seconds
             if time.time() -start_time > 0.3:
                 start_time=time.time()
                 drawing_by_level(blocks, fireball_width,fireball_height, 30, 50)
+        elif level=='hyper-hard':
+            #A new fireball appears after every 0.3 seconds
+            if time.time() -start_time > 0.2:
+                start_time=time.time()
+                drawing_by_level(blocks, fireball_width,fireball_height, 40, 60)
+        elif level=='mega-hard':
+            #A new fireball appears after every 0.3 seconds
+            if time.time() -start_time > 0.1:
+                start_time=time.time()
+                drawing_by_level(blocks, fireball_width,fireball_height, 50, 70)
 
         #Make sure that player cannot move outside the edge of the screen
         if lead_x >= display_width - size_x:
@@ -424,7 +452,7 @@ def gameLoop(level, mode):
             if ghost_immunity == False: #if there is no immunity then it checks whether the player has collided with a any fireball
                 if lead_x>i[0] and lead_x<i[0]+i[2] or lead_x+size_x>i[0] and \
                 lead_x+size_x<i[0]+i[2] or lead_x<i[0] and lead_x+size_x>i[0]+i[2]:
-                    if lead_y>i[1] and lead_y<i[1]+i[3] or lead_y+size_y>i[1] and \
+                    if lead_y>i[1]+i[3]/2 and lead_y<i[1]+i[3] or lead_y+size_y>i[1]+i[3]/2 and \
                     lead_y+size_y<i[1]+i[3]:
                         gameOver=True
         
